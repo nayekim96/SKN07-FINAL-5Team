@@ -15,21 +15,35 @@ load_dotenv()
 test_req = requests.get(os.environ.get('API_URL'))
 user_info = requests.get(os.environ.get('API_URL') + "/get_user_info")
 
-st.sidebar.title(test_req.json()['Hello'])
-page = st.sidebar.radio("Go to", ("Page 1", "Page 2", user_info.json()['user_info'][1] + "님 안녕하세요", "질문 생성", "이미지 OCR"))
+# st.sidebar.title(test_req.json()['Hello'])
+# page = st.sidebar.radio("Go to", ("Page 1", "Page 2", "zz", "질문 생성", "이미지 OCR"))
 
-st.sidebar.button("면접관리")
-st.sidebar.button("추천공고")
-st.sidebar.button("모의면접")
-st.sidebar.button("면접 히스토리")
 
-if page == "Page 1":
+def change_page(page):
+    st.session_state.page = page
+
+if st.sidebar.button("면접관리"):
     page1_app()
-elif page == "Page 2":
-    page2_app()  
-elif page == "질문 생성":
-    create_q_app()
-elif page == "이미지 OCR":
+if st.sidebar.button("추천공고"):
+    page2_app()
+if st.sidebar.button("모의면접"):
     ocr_app()
+if st.sidebar.button("면접 히스토리"):
+    create_q_app()
+
+# Using "with" notation
+with st.sidebar:
+    add_radio = st.button(
+        "Choose"
+    )
+
+# if page == "Page 1":
+#     page1_app()
+# elif page == "Page 2":
+#     page2_app()  
+# elif page == "질문 생성":
+#     create_q_app()
+# elif page == "이미지 OCR":
+#     ocr_app()
 
 
