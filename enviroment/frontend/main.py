@@ -1,14 +1,4 @@
 import streamlit as st
-from interview.mng_1 import app as page1_app  # 이력서 업로드 페이지
-from interview.mng_2 import app as page2_app  # 기업/직무/경력 입력 페이지
-from common.rec_1 import app as page3_app  # 추천공고
-from common.rec_2 import app as page4_app  # 추천공고 상세
-from interview.itv1 import app as ocr1_app  # 모의면접 - 시작화면
-from interview.itv2 import app as ocr2_app  # 모의면접 - 로딩화면
-from interview.itv3 import app as ocr3_app  # 모의면접 - 면접 진행
-from history.his1 import app as his1_app  # 히스토리
-from history.his2 import app as his2_app  # 히스토리 - 종합 레포트
-from history.his3 import app as his3_app  # 히스토리 - 영상 별 레포트트
 import requests
 from dotenv import load_dotenv
 import os
@@ -28,6 +18,7 @@ st.markdown(
                     padding-left: 5rem;
                     padding-right: 5rem;
                 }
+                [data-testid="stSidebarNav"] {display: none;}
         </style>
         """,
     unsafe_allow_html=True,
@@ -51,7 +42,7 @@ if "page" not in st.session_state:
 # 사이드바 메뉴 추가
 st.sidebar.title("메뉴")
 if st.sidebar.button("면접관리"):
-    st.session_state.page = "mng_1"
+    st.session_state.switch_page = "mng_1"
     st.rerun()
 if st.sidebar.button("추천공고"):
     st.session_state.page = "rec_1"
@@ -61,28 +52,31 @@ if st.sidebar.button("모의면접"):
     st.rerun()
 if st.sidebar.button("면접 히스토리"):
     st.session_state.page = "his1"
-    st.rerun()
+    st.switch_page("pages/his2.py")
 
-# 페이지 이동 로직
-if st.session_state.page == "mng_1":
-    page1_app()
-elif st.session_state.page == "mng_2":
-    page2_app()
-elif st.session_state.page == "rec_1":
-    page3_app()
-elif st.session_state.page == "rec_2":
-    page4_app()
-elif st.session_state.page == "itv1":
-    ocr1_app()
-elif st.session_state.page == "itv2":
-    ocr2_app()
-elif st.session_state.page == "itv3":
-   ocr3_app()
-elif st.session_state.page == "his1":
-    his1_app()
-elif st.session_state.page == "his2":
-    his2_app()
-elif st.session_state.page == "his3":
-    his3_app()
-else:
-    st.write("잘못된 페이지입니다.")
+# 페이지 이동 로직 / 잘못함
+#if st.session_state.page == "mng_1":
+#    page1_app()
+#elif st.session_state.page == "mng_2":
+#    page2_app()
+#elif st.session_state.page == "rec_1":
+#    page3_app()
+#elif st.session_state.page == "rec_2":
+#    page4_app()
+#elif st.session_state.page == "itv1":
+#    ocr1_app()
+#elif st.session_state.page == "itv2":
+#    ocr2_app()
+#elif st.session_state.page == "itv3":
+#   ocr3_app()
+#elif st.session_state.page == "his1":
+#    his1_app()
+#elif st.session_state.page == "his2":
+#    his2_app()
+#elif st.session_state.page == "his3":
+#    his3_app()
+#else:
+#    st.write("잘못된 페이지입니다.")
+
+# st.switch_page 사용
+
