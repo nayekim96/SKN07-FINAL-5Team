@@ -12,6 +12,26 @@ from history.his3 import app as his3_app  # 히스토리 - 영상 별 레포트�
 import requests
 from dotenv import load_dotenv
 import os
+st.set_page_config(layout="wide")
+# Remove whitespace from the top of the page and sidebar
+st.markdown(
+    """
+        <style>
+                .stAppHeader {
+                    background-color: rgba(255, 255, 255, 0.0);  /* Transparent background */
+                    visibility: visible;  /* Ensure the header is visible */
+                }
+
+               .block-container {
+                    padding-top: 1rem;
+                    padding-bottom: 0rem;
+                    padding-left: 5rem;
+                    padding-right: 5rem;
+                }
+        </style>
+        """,
+    unsafe_allow_html=True,
+)
 
 # 환경파일 로드
 load_dotenv()
