@@ -25,6 +25,21 @@ st.markdown(
 # 페이지 제목
 st.title("면접 히스토리")
 
+# 사이드바 메뉴 추가
+st.sidebar.title("메뉴")
+if st.sidebar.button("면접관리"):
+    st.session_state.switch_page = "mng_1"
+    st.rerun()
+if st.sidebar.button("추천공고"):
+    st.session_state.page = "rec_1"
+    st.rerun()
+if st.sidebar.button("모의면접"):
+    st.session_state.page = "itv1"
+    st.rerun()
+if st.sidebar.button("면접 히스토리"):
+    st.session_state.page = "his1"
+    st.switch_page("pages/his1.py")
+
 # 데이터
 interviews = [
     {"title": "종합 레포트 / 질문 별 면접", "date": "2025.03.06", "company": "기업", "role": "데이터 분석", "level": "신입"},

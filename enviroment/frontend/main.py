@@ -52,31 +52,9 @@ if st.sidebar.button("모의면접"):
     st.rerun()
 if st.sidebar.button("면접 히스토리"):
     st.session_state.page = "his1"
-    st.switch_page("pages/his2.py")
+    st.switch_page("pages/his1.py")
 
-# 페이지 이동 로직 / 잘못함
-#if st.session_state.page == "mng_1":
-#    page1_app()
-#elif st.session_state.page == "mng_2":
-#    page2_app()
-#elif st.session_state.page == "rec_1":
-#    page3_app()
-#elif st.session_state.page == "rec_2":
-#    page4_app()
-#elif st.session_state.page == "itv1":
-#    ocr1_app()
-#elif st.session_state.page == "itv2":
-#    ocr2_app()
-#elif st.session_state.page == "itv3":
-#   ocr3_app()
-#elif st.session_state.page == "his1":
-#    his1_app()
-#elif st.session_state.page == "his2":
-#    his2_app()
-#elif st.session_state.page == "his3":
-#    his3_app()
-#else:
-#    st.write("잘못된 페이지입니다.")
+
 
 # st.switch_page 사용
 
