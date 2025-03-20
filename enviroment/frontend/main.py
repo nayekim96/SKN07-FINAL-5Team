@@ -2,8 +2,10 @@ import streamlit as st
 import requests
 from dotenv import load_dotenv
 import os
+from sidebar import show_sidebar
 st.set_page_config(layout="wide")
-# Remove whitespace from the top of the page and sidebar
+
+# 페이지 상단 공백 제거 markdown
 st.markdown(
     """
         <style>
@@ -12,7 +14,7 @@ st.markdown(
                     visibility: visible;  /* Ensure the header is visible */
                 }
 
-               .block-container {
+            .block-container {
                     padding-top: 1rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
@@ -26,6 +28,7 @@ st.markdown(
 
 # 환경파일 로드
 load_dotenv()
+show_sidebar()
 
 # 백엔드 연동 테스트
 try:
@@ -39,20 +42,6 @@ except requests.exceptions.RequestException as e:
 if "page" not in st.session_state:
     st.session_state.page = "mng_1"  # 기본적으로 첫 번째 페이지에서 시작
 
-# 사이드바 메뉴 추가
-st.sidebar.title("메뉴")
-if st.sidebar.button("면접관리"):
-    st.session_state.switch_page = "mng_1"
-    st.rerun()
-if st.sidebar.button("추천공고"):
-    st.session_state.page = "rec_1"
-    st.rerun()
-if st.sidebar.button("모의면접"):
-    st.session_state.page = "itv1"
-    st.rerun()
-if st.sidebar.button("면접 히스토리"):
-    st.session_state.page = "his1"
-    st.switch_page("pages/his1.py")
 
 
 

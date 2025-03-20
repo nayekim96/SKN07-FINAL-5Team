@@ -1,4 +1,6 @@
 import streamlit as st
+from sidebar import show_sidebar
+
 st.set_page_config(layout="wide")
 # Remove whitespace from the top of the page and sidebar
 st.markdown(
@@ -9,7 +11,7 @@ st.markdown(
                     visibility: visible;  /* Ensure the header is visible */
                 }
 
-               .block-container {
+            .block-container {
                     padding-top: 1rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
@@ -22,7 +24,7 @@ st.markdown(
 )
 
 st.title("히스토리 - 종합 레포트")
-
+show_sidebar()
 # 데이터 불러오기
 if "selected_interview" not in st.session_state:
     st.session_state["selected_interview"] = {

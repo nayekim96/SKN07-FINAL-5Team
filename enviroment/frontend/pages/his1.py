@@ -1,6 +1,10 @@
 import streamlit as st
 from datetime import datetime # 나중에 datetime 쓸거 같아서 넣어놓음
+from sidebar import show_sidebar
+
 st.set_page_config(layout="wide")
+show_sidebar()
+
 # Remove whitespace from the top of the page and sidebar
 st.markdown(
     """
@@ -10,7 +14,7 @@ st.markdown(
                     visibility: visible;  /* Ensure the header is visible */
                 }
 
-               .block-container {
+            .block-container {
                     padding-top: 1rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
@@ -24,21 +28,6 @@ st.markdown(
 
 # 페이지 제목
 st.title("면접 히스토리")
-
-# 사이드바 메뉴 추가
-st.sidebar.title("메뉴")
-if st.sidebar.button("면접관리"):
-    st.session_state.switch_page = "mng_1"
-    st.rerun()
-if st.sidebar.button("추천공고"):
-    st.session_state.page = "rec_1"
-    st.rerun()
-if st.sidebar.button("모의면접"):
-    st.session_state.page = "itv1"
-    st.rerun()
-if st.sidebar.button("면접 히스토리"):
-    st.session_state.page = "his1"
-    st.switch_page("pages/his1.py")
 
 # 데이터
 interviews = [
