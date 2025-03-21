@@ -1,7 +1,6 @@
 import streamlit as st
-import time
 from sidebar import show_sidebar
-
+import time
 st.set_page_config(layout="wide")
 show_sidebar()
 # 페이지 상단 공백 제거 markdown
@@ -24,13 +23,27 @@ st.markdown(
         """,
     unsafe_allow_html=True,
 )
-# 7페이지: 모의면접 - 시작 화면
 
-st.title("모의면접 - 기업/직무")
+st.title("장비 테스트")
 
-# 안내 문구
-st.write("면접 준비가 되었으면 아래 버튼을 눌러 면접을 시작해주십시오.")
+enable = st.checkbox("카메라 체크크")
+picture = st.camera_input("Take a picture", disabled=not enable)
 
-# 면접 시작 버튼
-if st.button("면접 시작"):
-    st.switch_page("pages/itv2.py")
+if picture:
+    st.image(picture)
+
+
+audio_value = st.audio_input("마이크 체크")
+if audio_value:
+    st.audio(audio_value)
+
+
+if st.checkbox("2가지 모두 정상"):
+    time.sleep(1)
+    st.switch_page("pages/itv1.py")
+
+
+
+
+
+    

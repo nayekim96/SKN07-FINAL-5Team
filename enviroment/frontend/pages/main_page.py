@@ -32,4 +32,3 @@ load_dotenv()
 show_sidebar()
 
 st.title("AI 모의면접")
-

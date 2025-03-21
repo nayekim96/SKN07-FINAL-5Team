@@ -41,12 +41,3 @@ except requests.exceptions.RequestException as e:
 
 
 st.switch_page("pages/main_page.py")
-
-
-
-# 페이지 리스트
-pages = {
-    "홈": "app.py",
-    "페이지 1": "page1.py",
-    "페이지 2": "page2.py"
-}
