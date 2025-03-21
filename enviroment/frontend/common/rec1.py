@@ -1,3 +1,6 @@
+# PPT 3
+# 추천공고 - 랜덤추천
+
 import streamlit as st 
 
 # 랜덤 추천 공고를 보여주는 함수
