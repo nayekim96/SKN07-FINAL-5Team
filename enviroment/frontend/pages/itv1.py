@@ -1,9 +1,9 @@
 import streamlit as st
 import time
 from sidebar import show_sidebar
-show_sidebar()
-st.set_page_config(layout="wide")
 
+st.set_page_config(layout="wide")
+show_sidebar()
 # 페이지 상단 공백 제거 markdown
 st.markdown(
     """
@@ -33,5 +33,5 @@ st.write("면접 준비가 되었으면 아래 버튼을 눌러 면접을 시작
 
 # 면접 시작 버튼
 if st.button("면접 시작"):
-    st.session_state["page"] = "itv2"  # 다음 페이지 (로딩 화면)으로 이동
-    st.rerun()
+    #st.session_state["page"] = "itv2"  # 다음 페이지 (로딩 화면)으로 이동
+    st.switch_page("pages/itv2.py")
