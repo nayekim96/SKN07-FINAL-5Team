@@ -1,10 +1,12 @@
 import streamlit as st
+import requests
+from dotenv import load_dotenv
+import os
 from sidebar import show_sidebar
-show_sidebar()
-st.title("히스토리 - 영상 별 레포트트")
 
 st.set_page_config(layout="wide")
-# Remove whitespace from the top of the page and sidebar
+
+# 페이지 상단 공백 제거 markdown
 st.markdown(
     """
         <style>
@@ -24,3 +26,10 @@ st.markdown(
         """,
     unsafe_allow_html=True,
 )
+
+# 환경파일 로드
+load_dotenv()
+show_sidebar()
+
+st.title("AI 모의면접")
+

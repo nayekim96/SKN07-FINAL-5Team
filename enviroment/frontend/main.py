@@ -3,6 +3,7 @@ import requests
 from dotenv import load_dotenv
 import os
 from sidebar import show_sidebar
+
 st.set_page_config(layout="wide")
 
 # 페이지 상단 공백 제거 markdown
@@ -38,12 +39,14 @@ except requests.exceptions.RequestException as e:
     test_req, user_info = None, None
     st.error(f"백엔드 연결 실패: {e}")
 
-# 세션 상태 초기화 (기본값 설정)
-if "page" not in st.session_state:
-    st.session_state.page = "mng_1"  # 기본적으로 첫 번째 페이지에서 시작
+
+st.switch_page("pages/main_page.py")
 
 
 
-
-# st.switch_page 사용
-
+# 페이지 리스트
+pages = {
+    "홈": "app.py",
+    "페이지 1": "page1.py",
+    "페이지 2": "page2.py"
+}
