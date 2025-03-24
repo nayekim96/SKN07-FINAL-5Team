@@ -13,7 +13,13 @@ services: # 컨테이너 설정
     networks:
       mynet:
         # ip 설정
-        ipv4_address: 172.20.0.20
+        ipv4_address: 172.30.0.20
+    environment:
+      - DISPLAY=${DISPLAY}
+    devices:
+      - /dev/video0:/dev/video0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
     develop:
       # 로컬에서 수정 시 동기화 작업
       # path : 경로
