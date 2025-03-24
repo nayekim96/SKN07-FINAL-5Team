@@ -31,13 +31,4 @@ st.markdown(
 load_dotenv()
 show_sidebar()
 
-# 백엔드 연동 테스트
-try:
-    test_req = requests.get(os.environ.get('API_URL'))
-    user_info = requests.get(os.environ.get('API_URL') + "/get_user_info")
-except requests.exceptions.RequestException as e:
-    test_req, user_info = None, None
-    st.error(f"백엔드 연결 실패: {e}")
-
-
-st.switch_page("pages/main_page.py")
+st.title("AI 모의면접")

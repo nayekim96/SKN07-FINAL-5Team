@@ -1,11 +1,9 @@
 import streamlit as st
-import requests
-from dotenv import load_dotenv
-import os
+import time
 from sidebar import show_sidebar
 
 st.set_page_config(layout="wide")
-
+show_sidebar()
 # 페이지 상단 공백 제거 markdown
 st.markdown(
     """
@@ -26,18 +24,13 @@ st.markdown(
         """,
     unsafe_allow_html=True,
 )
+# 7페이지: 모의면접 - 시작 화면
 
-# 환경파일 로드
-load_dotenv()
-show_sidebar()
+st.title("모의면접 - 기업/직무")
 
-# 백엔드 연동 테스트
-try:
-    test_req = requests.get(os.environ.get('API_URL'))
-    user_info = requests.get(os.environ.get('API_URL') + "/get_user_info")
-except requests.exceptions.RequestException as e:
-    test_req, user_info = None, None
-    st.error(f"백엔드 연결 실패: {e}")
+# 안내 문구
+st.write("면접 준비가 되었으면 아래 버튼을 눌러 면접을 시작해주십시오.")
 
-
-st.switch_page("pages/main_page.py")
+# 면접 시작 버튼
+if st.button("면접 시작"):
+    st.switch_page("pages/itv2.py")

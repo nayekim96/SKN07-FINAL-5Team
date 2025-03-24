@@ -1,11 +1,10 @@
 import streamlit as st
-import requests
-from dotenv import load_dotenv
+import time
 import os
 from sidebar import show_sidebar
 
 st.set_page_config(layout="wide")
-
+show_sidebar()
 # 페이지 상단 공백 제거 markdown
 st.markdown(
     """
@@ -26,18 +25,11 @@ st.markdown(
         """,
     unsafe_allow_html=True,
 )
+# 페이지 제목 설정
+st.title("로딩중입니다 기다려!")
 
-# 환경파일 로드
-load_dotenv()
-show_sidebar()
+st.markdown("![Alt Text](https://blog.kakaocdn.net/dn/tToNP/btsvPnc77bN/0P5cqJMFM8hpaQcrIbK6v1/img.gif)")
+time.sleep(2)
 
-# 백엔드 연동 테스트
-try:
-    test_req = requests.get(os.environ.get('API_URL'))
-    user_info = requests.get(os.environ.get('API_URL') + "/get_user_info")
-except requests.exceptions.RequestException as e:
-    test_req, user_info = None, None
-    st.error(f"백엔드 연결 실패: {e}")
-
-
-st.switch_page("pages/main_page.py")
+# 로딩이 끝난 후 화면 전환
+st.switch_page("page/itv3.py")

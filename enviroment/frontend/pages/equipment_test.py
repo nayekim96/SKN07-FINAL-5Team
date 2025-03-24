@@ -1,11 +1,8 @@
 import streamlit as st
-import requests
-from dotenv import load_dotenv
-import os
 from sidebar import show_sidebar
-
+import time
 st.set_page_config(layout="wide")
-
+show_sidebar()
 # 페이지 상단 공백 제거 markdown
 st.markdown(
     """
@@ -27,17 +24,26 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 환경파일 로드
-load_dotenv()
-show_sidebar()
+st.title("장비 테스트")
 
-# 백엔드 연동 테스트
-try:
-    test_req = requests.get(os.environ.get('API_URL'))
-    user_info = requests.get(os.environ.get('API_URL') + "/get_user_info")
-except requests.exceptions.RequestException as e:
-    test_req, user_info = None, None
-    st.error(f"백엔드 연결 실패: {e}")
+enable = st.checkbox("카메라 체크크")
+picture = st.camera_input("Take a picture", disabled=not enable)
+
+if picture:
+    st.image(picture)
 
 
-st.switch_page("pages/main_page.py")
+audio_value = st.audio_input("마이크 체크")
+if audio_value:
+    st.audio(audio_value)
+
+
+if st.checkbox("2가지 모두 정상"):
+    time.sleep(1)
+    st.switch_page("pages/itv1.py")
+
+
+
+
+
+    
