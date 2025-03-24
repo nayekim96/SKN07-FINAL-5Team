@@ -44,7 +44,7 @@ services: # 컨테이너 설정
       - 9999:9999
     networks:
       mynet:
-        ipv4_address: 172.30.0.21
+        ipv4_address: 172.20.0.21
     develop:
       watch:
         - action: sync

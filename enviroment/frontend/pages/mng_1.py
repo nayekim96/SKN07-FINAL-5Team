@@ -1,6 +1,27 @@
 import streamlit as st
+from sidebar import show_sidebar
+st.set_page_config(layout="wide")
+show_sidebar()
+# 페이지 상단 공백 제거 markdown
+st.markdown(
+    """
+        <style>
+                .stAppHeader {
+                    background-color: rgba(255, 255, 255, 0.0);  /* Transparent background */
+                    visibility: visible;  /* Ensure the header is visible */
+                }
 
-
+            .block-container {
+                    padding-top: 1rem;
+                    padding-bottom: 0rem;
+                    padding-left: 5rem;
+                    padding-right: 5rem;
+                }
+                [data-testid="stSidebarNav"] {display: none;}
+        </style>
+        """,
+    unsafe_allow_html=True,
+)
 #   st.title("이력서 / 자소서 / 포트폴리오 \n업로드")
 st.markdown("""
 <h1 style='text-align: center; font-size: 36px; color: #000000; line-height: 1.2;'>이력서 / 자소서 / 포트폴리오</h1>
@@ -27,5 +48,4 @@ portfolio_file = st.file_uploader("포트폴리오를 업로드하세요 (PDF)",
 
 # 입력 완료 
 if st.button("입력 완료"):
-    st.session_state["page"] = "mng_2"
-    st.rerun()
+    st.switch_page("pages/equipment_test.py")

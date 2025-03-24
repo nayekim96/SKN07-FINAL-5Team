@@ -2,6 +2,7 @@ import streamlit as st
 from sidebar import show_sidebar
 
 st.set_page_config(layout="wide")
+show_sidebar()
 # Remove whitespace from the top of the page and sidebar
 st.markdown(
     """
@@ -24,7 +25,10 @@ st.markdown(
 )
 
 st.title("히스토리 - 종합 레포트")
-show_sidebar()
+
+if st.button("⬅ 면접 히스토리로 돌아가기"):
+    st.switch_page("pages/his1.py")
+
 # 데이터 불러오기
 if "selected_interview" not in st.session_state:
     st.session_state["selected_interview"] = {
@@ -37,10 +41,9 @@ st.write(f"###  {interview['company']} - {interview['role']} ({interview['level'
 st.write(f"면접 날짜: {interview['date']}")
 
 # 탭 구성
-tab1, tab2 = st.tabs(["종합 레포트", "영상 별 레포트"])
+tab1, tab2 = st.tabs(["종합 레포트", "상세 레포트"])
 
 with tab1:
-    st.subheader("종합 레포트")
     col1, col2 = st.columns([1, 1])
 
     # 고정된 영역별 점수 데이터
@@ -57,25 +60,32 @@ with tab1:
 
     st.markdown("---")
 
+
 with tab2:
-    st.subheader("🎥 영상 별 레포트")
+    # 두 개의 컬럼 생성 (70% : 30% 비율)
+    col1, col2 = st.columns([2, 1])
 
-    # 고정된 피드백 데이터
-    feedback_data = [
-        {"question": "공백기가 왜 이리 긴가?", "user_answer": "적절한 설명", "recommended_answer": "경험을 중심으로 설명", "feedback": "답변을 더 구체적으로 하면 좋습니다."},
-        {"question": "이전 직장에서 어떤 역할을 했나요?", "user_answer": "데이터 분석 담당", "recommended_answer": "주요 프로젝트와 성과 포함", "feedback": "성과를 강조하면 좋습니다."}
-    ]
+    # 왼쪽 컬럼: 피드백 리스트
+    with col1:
+        feedback_data = [
+            {"question": "공백기가 왜 이리 긴가?", "user_answer": "적절한 설명", "recommended_answer": "경험을 중심으로 설명", "feedback": "답변을 더 구체적으로 하면 좋습니다."},
+            {"question": "이전 직장에서 어떤 역할을 했나요?", "user_answer": "데이터 분석 담당", "recommended_answer": "주요 프로젝트와 성과 포함", "feedback": "성과를 강조하면 좋습니다."},
+            {"question": "공백기가 왜 이리 긴가?", "user_answer": "적절한 설명", "recommended_answer": "경험을 중심으로 설명", "feedback": "답변을 더 구체적으로 하면 좋습니다."},
+            {"question": "공백기가 왜 이리 긴가?", "user_answer": "적절한 설명", "recommended_answer": "경험을 중심으로 설명", "feedback": "답변을 더 구체적으로 하면 좋습니다."},
+            {"question": "공백기가 왜 이리 긴가?", "user_answer": "적절한 설명", "recommended_answer": "경험을 중심으로 설명", "feedback": "답변을 더 구체적으로 하면 좋습니다."},
+            {"question": "공백기가 왜 이리 긴가?", "user_answer": "적절한 설명", "recommended_answer": "경험을 중심으로 설명", "feedback": "답변을 더 구체적으로 하면 좋습니다."},
+        ]
 
-    for idx, feedback in enumerate(feedback_data, 1):
-        st.write(f"### {idx}번 질문 피드백")
-        st.write(f"**질문:** {feedback['question']}")
-        st.write(f"**사용자 답변:** {feedback['user_answer']}")
-        st.write(f"**권장 답변:** {feedback['recommended_answer']}")
-        st.write(f" {feedback['feedback']}")
-        st.markdown("---")
+        for idx, feedback in enumerate(feedback_data, 1):
+            st.write(f"### {idx}번 질문 피드백")
+            st.write(f"**질문:** {feedback['question']}")
+            st.write(f"**사용자 답변:** {feedback['user_answer']}")
+            st.write(f"**권장 답변:** {feedback['recommended_answer']}")
+            st.write(f" {feedback['feedback']}")
+            st.markdown("---")
+
+    # 오른쪽 컬럼: 메모 입력
+    with col2:
+        memo = st.text_area("✍️ 면접 메모")
 
 
-    memo = st.text_area("면접 메모:")
-
-    if st.button("⬅ 면접 히스토리로 돌아가기"):
-        st.switch_page("pages/his1.py")
