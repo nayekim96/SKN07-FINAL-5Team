@@ -5,13 +5,14 @@ import chromadb
 import fitz  # PDF에서 텍스트 추출
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File
-from sqlalchemy import create_engine, Column, Integer, String, Text, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from datetime import datetime
 from sqlalchemy import create_engine, text
+from sqlalchemy.ext.declarative import declarative_base
 import pandas as pd
 import psycopg2
+import torch
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 # .env 파일 로드
 load_dotenv()
@@ -66,3 +67,12 @@ def del_last_data():
     db.commit()
     cursor.close()
     db.close()
+
+def get_embedding(text, model="text-embedding-3-large"):
+    response = openai.embeddings.create(
+        model=model,
+        input=text.replace("\n", "").strip()
+    )
+    return response.data[0].embedding
+
+embedding = get_embedding(text)
