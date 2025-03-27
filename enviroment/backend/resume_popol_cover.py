@@ -31,14 +31,13 @@ db.autocommit = False # 자동 커밋 False
 
 user_id = 'interview' 
 
-# read pdf
+# read pdf & pdf to text
 def read_pdf():
     path = "pdf 파일 경로"
     doc = fitz.open(path, filetype="pdf")
     resume_text = "\n".join([page.get_text("text") for page in doc])
     return resume_text
 
-#def embedding_pdf_text():
 
 
 # 데이터 삽입 함수
@@ -68,11 +67,13 @@ def del_last_data():
     cursor.close()
     db.close()
 
+# text 임베딩 함수 
 def get_embedding(text, model="text-embedding-3-large"):
     response = openai.embeddings.create(
         model=model,
         input=text.replace("\n", "").strip()
     )
     return response.data[0].embedding
+# 사용 예시 embedding = get_embedding(text)
 
-embedding = get_embedding(text)
+
