@@ -22,6 +22,10 @@ class post_db_connect():
     def select_many(self, query: str, num: int):
         self.cursor.execute(query)
         return self.cursor.fetchmany(num)
+    
+    def select_many_vars(self, query:str, conditions, num: int):
+        self.cursor.execute(query, conditions)
+        return self.cursor.fetchmany(num)
 
     def select_all(self, query: str):
         self.cursor.execute(query)
@@ -31,6 +35,10 @@ class post_db_connect():
         result = self.cursor.execute(query)
         self.db.commit()
         return result
+    
+    def insert_many_vars(self, query: str, conditions):
+        self.cursor.execute(query, conditions)
+        return self.db.commit()
     
     def close(self):
         self.cursor.close()

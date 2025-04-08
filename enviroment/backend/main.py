@@ -1,15 +1,9 @@
 from typing import Union
-from fastapi import APIRouter, FastAPI, status
+from fastapi import FastAPI, status
 from pydantic import BaseModel
 from db_util.db_utils import post_db_connect
-from routers.main_routers import api_router
 
-app = FastAPI(
-    title="SKAI Networks7 mock interview",
-    version="0.1"
-)
-
-app.include_router(api_router)
+app = FastAPI()
 
 class HealthCheck(BaseModel):
     """Response model to validate and return when performing a health check."""
