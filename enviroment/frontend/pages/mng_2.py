@@ -2,7 +2,6 @@ import streamlit as st
 import os
 import sys
 from sidebar import show_sidebar
-from ...backend.db_util.db_utils import post_db_connect
 from utils.mock_interview import Mock_interview
 
 
@@ -14,34 +13,6 @@ if main_dir not in sys.path:
     sys.path.append(main_dir)
 
 interview = Mock_interview()
-
-# --------- DB 연결 정의 ----------
-pdb = post_db_connect()
-
-# --------- Data Load ----------
-def get_company_master_tbl_from_db():
-    """
-    기업 마스터 테이블 데이터 로드
-    """
-    select_query = f"""
-    SELECT common_id, common_nm
-    FROM company_code_master_tbl;
-    """
-    company_master = pdb.select_one(select_query)
-
-    return company_master
-
-def get_job_master_tbl_from_db():
-    """
-    직무 마스터 테이블 데이터 로드
-    """
-    select_query = f"""
-    SELECT common_id, common_nm
-    FROM company_code_master_tbl;
-    """
-    company_master = pdb.select_one(select_query)
-
-    return company_master
 
 
 st.set_page_config(layout="wide")
