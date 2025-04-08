@@ -1,0 +1,33 @@
+import requests
+from dotenv import load_dotenv
+import os
+
+class Backend:
+    def __init__(self):
+        load_dotenv()
+        self.API_URL = os.environ.get('API_URL')
+        
+    def req_get(self, URL,**headers):
+        try:
+            res = None
+            if headers:
+                res = requests.get(url=self.API_URL+URL, headers=headers)
+            else:
+                res = requests.get(url=self.API_URL+URL)
+            res.raise_for_status()
+            return res
+        except requests.exceptions.RequestException as e:
+            return {'message' : e, 'status_code': res.status_code}
+        
+    
+    def req_post(self, URL:str, data:dict, **headers):
+        try:
+            res = None
+            if headers:
+                res = requests.post(url=self.API_URL+URL, data=data,headers=headers)
+            else:
+                res = requests.post(url=self.API_URL+URL, data=data)
+            res.raise_for_status()
+            return res
+        except requests.exceptions.RequestException as e:
+            return {'message' : e, 'status_code': res.status_code}
