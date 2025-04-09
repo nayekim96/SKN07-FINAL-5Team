@@ -30,3 +30,4 @@ def common_select_process(select_list:dict, key:str, value: str, list_nm: str):
     select_box.update(sum_dict)
     del sum_dict
     return {list_nm: select_box, 'labels': list(select_box.keys())}
+

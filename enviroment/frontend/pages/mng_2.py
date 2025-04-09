@@ -1,9 +1,7 @@
 import streamlit as st
+from sidebar import show_sidebar
 import os
 import sys
-from sidebar import show_sidebar
-from utils.mock_interview import Mock_interview
-
 
 # # 현재 파일의 디렉토리 경로
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -12,8 +10,9 @@ main_dir = os.path.abspath(os.path.join(current_dir, ".."))
 if main_dir not in sys.path:
     sys.path.append(main_dir)
 
-interview = Mock_interview()
+from utils.mock_interview import Mock_interview
 
+interview = Mock_interview()
 
 st.set_page_config(layout="wide")
 show_sidebar()
@@ -95,4 +94,5 @@ with col2:
         if company_name != common_select_text and \
            job_title != common_select_text:
             set_company_job_info()
+
             st.switch_page("pages/equipment_test.py")

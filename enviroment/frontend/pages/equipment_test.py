@@ -191,4 +191,6 @@ if __name__ == "__main__":
         with col2:
             if st.button('테스트 완료', key="test_done"):
                 time.sleep(1)
+
                 st.switch_page("pages/itv1.py")
+
