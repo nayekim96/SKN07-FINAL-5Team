@@ -54,26 +54,6 @@ st.markdown(
 
 col_left, col_center, col_right = st.columns([0.2, 1, 0.2])
 
-<<<<<<< HEAD
-=======
-# 중앙 컨테이너 시작
-# st.markdown("""
-#             <div class="wrapper">
-#                 <div class="content">
-#                     <h2 style='text-align: center;'>면접 준비가 되었으면 아래 버튼을 눌러 면접을 시작해주십시오.</h1>
-#             """, unsafe_allow_html=True)
-
-# # 안내 문구
-# # st.markdown("<h2 style='text-align: center;'>면접 준비가 되었으면 아래 버튼을 눌러 면접을 시작해주십시오.</h1>", unsafe_allow_html=True)
-
-# # 면접 시작 버튼
-# # if st.button("면접 시작"):
-# #     st.switch_page("pages/itv2.py")
-
-# # 중앙 컨테이너 종료
-# st.markdown("""</div>
-#             </div>""", unsafe_allow_html=True)
->>>>>>> origin/minhyuk
 with col_left:
     pass
 with col_center:

@@ -56,7 +56,12 @@ def main():
     #st.write('1. 웹캠 테스트 :no_entry_sign:')
     
     webcam = cv2.VideoCapture(0, cv2.CAP_V4L2)
+
     st.write(st.session_state.webcam_bool)
+
+    # ##### 임시!!!! 웹캠 테스트 강제 완료 설정
+    st.session_state.webcam_bool = True
+
     if not webcam.isOpened() and st.session_state.webcam_bool == False:
         webcam_placeholder.write('1. 웹캠 테스트 :no_entry_sign:')
     else:
