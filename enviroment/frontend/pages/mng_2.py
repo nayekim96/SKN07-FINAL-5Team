@@ -12,6 +12,7 @@ if main_dir not in sys.path:
 
 from utils.mock_interview import Mock_interview
 
+
 interview = Mock_interview()
 
 st.set_page_config(layout="wide")
@@ -77,6 +78,12 @@ experience_placeholder = st.empty()
 # 버튼을 거의 붙여서 정렬
 col1, col2 = st.columns([5, 5])
 
+# 이전, 다음 페이지 이동
+# with col1:
+#     if st.button("이전"):
+#         st.session_state["page"] = "mng_1" # 포트폴리오 업로드 페이지 이동
+#         st.rerun()
+
 if experience_years == '경력':
     experience_placeholder.number_input('연차를 입력하세요', value=1, step=1, min_value=1, max_value=50, format="%d")
 else:
@@ -94,5 +101,4 @@ with col2:
         if company_name != common_select_text and \
            job_title != common_select_text:
             set_company_job_info()
-
             st.switch_page("pages/equipment_test.py")
