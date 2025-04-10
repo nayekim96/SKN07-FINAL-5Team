@@ -63,8 +63,6 @@ class GenerateQuestion(post_db_connect):
             jcm.common_nm = %s
         """
 
-
-
         # query에서 사용자가 면접 전 선택한 기업/직무/경력 정보와 join 한 면접 질문 가져옴.
         select_query = """
         SELECT interview_eval, interview_tip, interview_qa
@@ -83,7 +81,7 @@ class GenerateQuestion(post_db_connect):
 
         return prev_questions
 
-    def generate_question(self, prev_questions, application_mats):
+    def generate_question(self, prev_questions, application_mats, user_queries):
         """
         질문 생성 Agent
 
@@ -116,8 +114,6 @@ class GenerateQuestion(post_db_connect):
             
         else:
             return "면접 기출 질문 데이터가 존재하지 않습니다."
-
-        user_queries = []
 
         # 프롬프트
         prompt_content = f"""
@@ -187,4 +183,3 @@ class GenerateQuestion(post_db_connect):
 
         response = llm([HumanMessage(content=prompt_content)])
         return response.content
-
