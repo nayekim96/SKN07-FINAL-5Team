@@ -46,7 +46,39 @@ services: # 컨테이너 설정
           target: /home/encore/
           ignore: 
             - frontend/
-
+            
+  chroma:
+    image: chromadb/chroma:latest 
+    volumes:
+      # The default config specifies a persist_directory of /data.
+      # Read more about deployments: https://docs.trychroma.com/deployment
+      - chroma-data:/data\
+    ports:
+      - "8000:8000"
+    healthcheck:
+      # Adjust below to match your container port
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v2/heartbeat" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - mynet
+  
+    elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:latest
+      container_name: elasticsearch
+      environment:
+        - discovery.type=single-node
+        - xpack.security.enabled=false
+        - xpack.security.transport.ssl.enabled=false
+      ports:
+        - "9200:9200"
+      volumes:
+        - esdata:/usr/share/elasticsearch/data
+  
+  volumes:
+    esdata:
+  
 networks:
   # compose 파일에서 사용할 network 설정
   # name : 밖에서 CLI 로 만든 network 작성
@@ -54,3 +86,7 @@ networks:
   mynet:
     name: final
     external: true
+
+volumes:
+  chroma-data:
+    driver: local
