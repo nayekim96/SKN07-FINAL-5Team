@@ -124,12 +124,14 @@ with col2:
             job_nm = st.session_state['job_name']
             experience = st.session_state['experience']
 
+            user_queries = [company_nm, job_nm, experience]
+
             # 지원자료, 면접 후기 데이터 로드
             applications = question.get_application_mats_from_db(user_id='interview')
             prev_questions = question.get_prev_questions_from_db(company_nm, job_nm, experience)
 
             # 질문 생성 후 session에 저장
-            st.session_state['new_questions'] = question.generate_question(prev_questions, applications)
+            st.session_state['new_questions'] = question.generate_question(prev_questions, applications, user_queries)
 
             #장비테스트 페이지 이동
             st.switch_page("pages/equipment_test.py")
