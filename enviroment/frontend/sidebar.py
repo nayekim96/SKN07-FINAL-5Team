@@ -9,7 +9,7 @@ def show_sidebar():
     if st.sidebar.button("면접관리"):
         st.switch_page("pages/mng_1.py")
 
-    if st.sidebar.button("추천공고"):
+    if st.sidebar.button("채용공고"):
         st.switch_page("pages/rec_1.py")
 
     if st.sidebar.button("모의면접"):
