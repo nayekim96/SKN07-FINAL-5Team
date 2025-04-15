@@ -1,8 +1,13 @@
 import os
 import sys
 import pandas as pd
+import openai
+from dotenv import load_dotenv
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
+
+
+load_dotenv()
 
 # --------- DIRECTORY PATH SETTING ----------
 # # 현재 파일의 디렉토리 경로
@@ -50,7 +55,7 @@ class GenerateQuestion(post_db_connect):
         """
 
         # master table에서 입력 받은 직무코드명과 일치하는 캐치에서 사용되는 직무명 반환
-        job_code_query = """
+        job_code_query = f"""
         SELECT
             public.catch_job_code.job_nm
         FROM 
@@ -60,22 +65,33 @@ class GenerateQuestion(post_db_connect):
         JOIN 
             public.catch_job_code ON seperated_job_code::int = public.catch_job_code.job_code
         WHERE
-            jcm.common_nm = %s
+            jcm.common_nm = '{job_name}'
         """
+        actual_job_code = self.select_all(job_code_query)
+        print(actual_job_code)
+        
+        # RealDictRow형태로 반환된 job_nm을 리스트 형태로 변경 (변경해줘야 쿼리에서 처리 가능)
+        code_names = [row['job_nm'] for row in actual_job_code]
+        print(code_names)
+
+        # code 수만큼 %s 생성    
+        if code_names:
+            job_names_placeholder = ','.join(['%s'] * len(code_names))
+        else:
+            job_names_placeholder = '%s'
+            code_names = ['']
 
         # query에서 사용자가 면접 전 선택한 기업/직무/경력 정보와 join 한 면접 질문 가져옴.
-        # select_query = """
-        # SELECT interview_eval, interview_tip, interview_qa
-        # FROM interview_review
-        # WHERE company_nm LIKE %s AND job_code_nm LIKE %s AND recruit_gubun LIKE %s LIMIT 10;
-        # """
-
-        # 사용자 입력값
+        select_query = f"""
+        SELECT interview_eval, interview_tip, interview_qa
+        FROM interview_review
+        WHERE company_nm LIKE %s AND job_code_nm in ({job_names_placeholder}) AND recruit_gubun LIKE %s LIMIT 10;  
+        """
         company_name = f"%{company_name}%"
-        job_name = f"%{job_name}%"
         recruit_gubun = f"%{recruit_gubun}%"
+        conditions = (company_name, *code_names, recruit_gubun) # 리스트로 반환된 code_names를 unpack
 
-        prev_questions = self.select_many_vars(job_code_query, conditions=(company_name, job_name, recruit_gubun), num=10)
+        prev_questions = self.select_many_vars(select_query, conditions=conditions, num=10)
 
         print(prev_questions)
 
@@ -115,7 +131,9 @@ class GenerateQuestion(post_db_connect):
         else:
             return "면접 기출 질문 데이터가 존재하지 않습니다."
 
-        # 프롬프트
+        # ------- 프롬프트 -------
+        # 분야별 질문 생성 규칙
+
         prompt_content = f"""
         당신은 AI 면접 질문 생성기입니다.
         아래의 **질문 생성 규칙**과 **참고 자료**를 바탕으로 **면접 예상 질문 10개**를 생성해주세요.
@@ -125,9 +143,9 @@ class GenerateQuestion(post_db_connect):
 
             2. 기출 질문과 완전히 동일한 질문은 피하고, 새로운 질문으로 변형하세요.
 
-            3. 참고 자료의 면접 팁과 평가 기준을 고려해, 질문 의도로 설정하세요.
+            3. 참고 자료의 면접 팁과 평가 기준을 질문 의도로 설정하세요.
 
-            4. 지원 자료가 있는 경우, 자료를 분석해 진행한 프로젝트를 추출하고 진행한 프로젝트에 관한 질문을 생성하세요. 질문 하단에 추출한 프로젝트를 명시하세요.
+            4. 지원 자료가 있는 경우, 자료를 분석해 진행한 과제나 프로젝트를 추출하고 프로젝트와 관련된 질문을 생성하세요. 질문 하단에 추출한 프로젝트를 명시하세요.
 
             5. 지원 자료가 있는 경우, 자료를 분석해 희망 직무, 기술스택을 추출하고 기술 관련 질문 생성 시 참고하세요. 질문 하단에 추출한 직무, 기술스택을 명시하세요.
 
@@ -145,11 +163,9 @@ class GenerateQuestion(post_db_connect):
 
             * 업무 스킬 질문: 2개
 
-            9. 참고 자료를 분석해 해당 기업이 중요하게 생각하는 가치관을 추출하고, 해당 가치관에 적합한 사람인지 판단하는 질문을 생성하세요. 
-
-            10. 질문 내용 하단에 어떤 기출 질문을 참고했는지 명시해주세요.
+            9. 질문 내용 하단에 어떤 기출 질문을 참고했는지 명시해주세요.
             
-            11. 질문은 아래 형식에 맞춰 출력해주세요:
+            10. 질문은 아래 형식에 맞춰 출력해주세요:
                 1. 질문 내용
                 2. 질문 내용
                 ...
@@ -183,3 +199,4 @@ class GenerateQuestion(post_db_connect):
 
         response = llm([HumanMessage(content=prompt_content)])
         return response.content
+    
