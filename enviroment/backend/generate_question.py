@@ -64,18 +64,18 @@ class GenerateQuestion(post_db_connect):
         """
 
         # query에서 사용자가 면접 전 선택한 기업/직무/경력 정보와 join 한 면접 질문 가져옴.
-        select_query = """
-        SELECT interview_eval, interview_tip, interview_qa
-        FROM interview_review
-        WHERE company_nm LIKE %s AND job_code_nm LIKE %s AND recruit_gubun LIKE %s LIMIT 10;
-        """
+        # select_query = """
+        # SELECT interview_eval, interview_tip, interview_qa
+        # FROM interview_review
+        # WHERE company_nm LIKE %s AND job_code_nm LIKE %s AND recruit_gubun LIKE %s LIMIT 10;
+        # """
 
         # 사용자 입력값
         company_name = f"%{company_name}%"
         job_name = f"%{job_name}%"
         recruit_gubun = f"%{recruit_gubun}%"
 
-        prev_questions = self.select_many_vars(select_query, conditions=(company_name, job_name, recruit_gubun), num=10)
+        prev_questions = self.select_many_vars(job_code_query, conditions=(company_name, job_name, recruit_gubun), num=10)
 
         print(prev_questions)
 
