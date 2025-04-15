@@ -65,7 +65,7 @@ services: # 컨테이너 설정
       - mynet
   
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:latest
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
