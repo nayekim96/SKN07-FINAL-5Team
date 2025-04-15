@@ -1,5 +1,15 @@
 # 모의면접 Routers
+import os
+import sys
 from fastapi import APIRouter
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 상위 디렉토리 (/backend)
+main_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if main_dir not in sys.path:
+    sys.path.append(main_dir)
+
 from db_util.db_utils import post_db_connect
 
 router = APIRouter(prefix="/itv")
@@ -16,7 +26,7 @@ def get_company_list():
 
 
 @router.get('/get_job_list', status_code=200)
-def get_company_list():
+def get_job_list():
     connect = post_db_connect()
     result = connect.select_all("""select jcmt.common_id as common_id,
                                           jcmt.common_nm as common_nm

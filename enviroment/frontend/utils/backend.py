@@ -17,7 +17,7 @@ class Backend:
             res.raise_for_status()
             return res
         except requests.exceptions.RequestException as e:
-            return {'message' : e, 'status_code': res.status_code}
+            return {'message': str(e), 'status_code': getattr(e.response, 'status_code', 'unknown')}
         
     
     def req_post(self, URL:str, data:dict, **headers):
@@ -30,4 +30,5 @@ class Backend:
             res.raise_for_status()
             return res
         except requests.exceptions.RequestException as e:
-            return {'message' : e, 'status_code': res.status_code}
+            return {'message': str(e), 'status_code': getattr(e.response, 'status_code', 'unknown')}
+        
