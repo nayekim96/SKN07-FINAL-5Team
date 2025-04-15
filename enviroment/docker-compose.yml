@@ -76,9 +76,6 @@ services: # 컨테이너 설정
     volumes:
       - esdata:/usr/share/elasticsearch/data
 
-volumes:
-  esdata:
-  
 networks:
   # compose 파일에서 사용할 network 설정
   # name : 밖에서 CLI 로 만든 network 작성
@@ -88,5 +85,6 @@ networks:
     external: true
 
 volumes:
+  esdata:
   chroma-data:
     driver: local
