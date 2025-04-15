@@ -200,3 +200,10 @@ class GenerateQuestion(post_db_connect):
         response = llm([HumanMessage(content=prompt_content)])
         return response.content
     
+
+
+if __name__ == '__main__':
+    # 다른 이력서, 자소서, 포폴 넣었을 때 질문 생성 확인
+    question = GenerateQuestion()
+    appli_mats = question.get_application_mats_from_db('interview')
+    prev_questions = question.get_prev_questions_from_db()
