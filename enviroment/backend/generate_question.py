@@ -39,7 +39,8 @@ class GenerateQuestion(post_db_connect):
         select_query = f"""
         SELECT resume_text, cover_letter_text, popol_text
         FROM resume_popol_history
-        WHERE user_id = '{user_id}';
+        WHERE user_id = '{user_id}'
+        LIMIT 1;
         """
         application_mats = self.select_one(select_query)
 
@@ -205,5 +206,15 @@ class GenerateQuestion(post_db_connect):
 if __name__ == '__main__':
     # 다른 이력서, 자소서, 포폴 넣었을 때 질문 생성 확인
     question = GenerateQuestion()
+    company_name = '한섬'
+    job_name = '의류/패션'
+    recruit_gubun = '신입'
+    user_queries = [company_name, job_name, recruit_gubun]
+
+
     appli_mats = question.get_application_mats_from_db('interview')
-    prev_questions = question.get_prev_questions_from_db()
+    prev_questions = question.get_prev_questions_from_db(company_name, job_name, recruit_gubun)
+
+    questions = question.generate_question(prev_questions, appli_mats, user_queries)
+
+    print(questions)
