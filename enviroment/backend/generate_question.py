@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from .prompt.prompts import qa_hum_prompt, qa_eng_prompt, qa_arts_prompt
+from prompt.prompts import qa_hum_prompt, qa_eng_prompt, qa_arts_prompt
 
 
 load_dotenv()

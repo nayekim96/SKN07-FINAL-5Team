@@ -3,7 +3,7 @@ import sys
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import JsonOutputParser
 from prompt.prompts import ev_hum_prompt, ev_eng_prompt, ev_arts_prompt
 from generate_question import GenerateQuestion
 
@@ -187,23 +187,30 @@ def evaluate_answers(interview_data, application_mats, user_query):
         ---
 
         [출력 형식 예시]
+        다음 형식의 JSON으로 응답해주세요:
 
-        **권장 답변:**  
-        (LLM이 생성)
-
-        **피드백:**
-        (평가한 항목에 대해서만 피드백)
-        - 논리성: …  
-        - 질문 이해도: … 
-
-        **총평:**  
-        (문장형 종합 피드백, 답변 개선 방향 위주로 작성)
+        {{
+        "권장답변": "...",
+        "피드백": {{
+            "논리성": "...",
+            "질문 이해도": "...",
+            "직무 전문성": "...",
+            "표현 습관": "...",
+            "시간 활용력": "...",
+            "전달력": "...",
+            "자기표현력": "..."
+        }},
+        "총평": "..."
+        }}
+        ※ 각 피드백 항목은 질문에 적합한 항목에 대해서만 작성해주세요.
+        ※ 작성하지 않을 항목은 null 값으로 두어도 됩니다.
+        ※ 전체 구조가 JSON으로 유효하게 닫히도록 작성해주세요.
 
         """
     )
 
     # output parser
-    output_parser = StrOutputParser()
+    output_parser = JsonOutputParser()
 
     # 체인 생성
     chain = prompt | llm | output_parser
@@ -227,3 +234,18 @@ def evaluate_answers(interview_data, application_mats, user_query):
 # 권장 답변 생성하여 RDB 저장
 def save_example_answer(response):
     pass
+
+
+# if __name__ == '__main__':
+#     appli_mats = get_application_mats('interview')
+#     interview_data = get_interview_data('interview')
+
+#     company_name = '네이버'
+#     job_name = 'IT/개발/데이터'
+#     experience = '신입'
+
+#     user_queries = [company_name, job_name, experience]
+
+#     results = evaluate_answers(interview_data, appli_mats, user_queries)
+
+#     print(results['피드백'])
