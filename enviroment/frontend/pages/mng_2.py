@@ -126,12 +126,15 @@ with col2:
 
             user_queries = [company_nm, job_nm, experience]
 
+            # 답변 평가 시 활용 예정
+            st.session_state['user_queries'] = user_queries
+
             # 지원자료, 면접 후기 데이터 로드
-            applications = question.get_application_mats_from_db(user_id='interview')
+            application_mats = question.get_application_mats_from_db('interview')
             prev_questions = question.get_prev_questions_from_db(company_nm, job_nm, experience)
 
             # 질문 생성 후 session에 저장
-            st.session_state['new_questions'] = question.generate_question(prev_questions, applications, user_queries)
+            st.session_state['new_questions'] = question.generate_question(prev_questions, application_mats, user_queries)
 
             #장비테스트 페이지 이동
             st.switch_page("pages/equipment_test.py")
