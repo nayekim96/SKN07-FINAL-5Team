@@ -13,3 +13,19 @@ class Mock_interview(Backend):
         URL = '/mock/itv/get_job_list'
         result = self.req_get(URL)
         return result.json()
+
+    def get_question_list(self, data:dict, headers):
+        URL = '/mock/mng/get_question_list'
+        result = self.req_post(URL, data, headers)
+        return result.json()
+
+    def interview_start(self, data:dict , headers):
+        URL = '/mock/itv/interview_start'
+        result = self.req_post(URL, data, headers)
+        return result.json()
+
+
+    def interview_result_process(self, data:dict, headers):
+        URL = '/mock/itv/interview_result_process'
+        result = self.req_post(URL, data, headers)
+        return result.json()
