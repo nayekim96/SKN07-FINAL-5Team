@@ -23,7 +23,6 @@ if top_dir not in sys.path:
 
 # 면접 질문 생성 class import
 from backend.generate_question import GenerateQuestion
-question = GenerateQuestion()
 
 # --------- sidebar 호출 ---------
 st.set_page_config(layout="wide")
@@ -106,6 +105,7 @@ else:
 
 with col2:
     if st.button("입력 완료"):
+
         # 기업 확인
         if company_name == common_select_text:
             company_placeholder.warning('기업을 선택해주세요!' , icon="⚠️")
@@ -128,6 +128,8 @@ with col2:
 
             # 답변 평가 시 활용 예정
             st.session_state['user_queries'] = user_queries
+
+            question = GenerateQuestion()
 
             # 지원자료, 면접 후기 데이터 로드
             application_mats = question.get_application_mats_from_db('interview')
