@@ -23,7 +23,7 @@ popol_text= "\n".join([page.extract_text() for page in doc])
 print(popol_text)
 
 # DB Insert
-user_id = 'interview'
+user_id = 'interview3'
 
 def insert_data(user_id, resume_text, cover_letter_text, popol_text):
     insert_query = """

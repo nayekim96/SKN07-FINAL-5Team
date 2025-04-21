@@ -28,6 +28,14 @@ class post_db_connect():
         self.cursor.execute(query)
         return self.cursor.fetchall()
     
+    def select_all_vars(self, query:str, conditions):
+        # conditions에 int형 변수가 올 때, tuple로 변경
+        # psycopg2의 cursor.execute(query, params)에서 params는 반드시 시퀀스 타입 (list, tuple) 이어야 함
+        if not isinstance(conditions, (tuple, list)):
+            conditions = (conditions,)
+        self.cursor.execute(query, conditions)
+        return self.cursor.fetchall()
+    
     def select_many_vars(self, query:str, conditions, num: int):
         self.cursor.execute(query, conditions)
         return self.cursor.fetchmany(num)

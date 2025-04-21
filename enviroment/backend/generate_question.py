@@ -1,10 +1,11 @@
 import os
 import sys
-import pandas as pd
-import openai
+import re
 from dotenv import load_dotenv
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from prompt.prompts import qa_hum_prompt, qa_eng_prompt, qa_arts_prompt
 
 
 load_dotenv()
@@ -29,6 +30,7 @@ class GenerateQuestion(post_db_connect):
     def __init__(self):
         super().__init__()
 
+    # 지원 자료 특성 추출
     def get_application_mats_from_db(self, user_id):
         """
         지원 자료 데이터 로드 - 이력서, 포트폴리오, 자소서
@@ -39,8 +41,7 @@ class GenerateQuestion(post_db_connect):
         select_query = f"""
         SELECT resume_text, cover_letter_text, popol_text
         FROM resume_popol_history
-        WHERE user_id = '{user_id}'
-        LIMIT 1;
+        WHERE user_id = '{user_id}';
         """
         application_mats = self.select_one(select_query)
 
@@ -69,11 +70,9 @@ class GenerateQuestion(post_db_connect):
             jcm.common_nm = '{job_name}'
         """
         actual_job_code = self.select_all(job_code_query)
-        print(actual_job_code)
         
         # RealDictRow형태로 반환된 job_nm을 리스트 형태로 변경 (변경해줘야 쿼리에서 처리 가능)
         code_names = [row['job_nm'] for row in actual_job_code]
-        print(code_names)
 
         # code 수만큼 %s 생성    
         if code_names:
@@ -94,8 +93,6 @@ class GenerateQuestion(post_db_connect):
 
         prev_questions = self.select_many_vars(select_query, conditions=conditions, num=10)
 
-        print(prev_questions)
-
         return prev_questions
 
     def generate_question(self, prev_questions, application_mats, user_queries):
@@ -107,27 +104,30 @@ class GenerateQuestion(post_db_connect):
         """
         # 모델 정의
         llm = ChatOpenAI(
-            model='gpt-4o-2024-08-06'
+            model='gpt-4o-2024-08-06',
+            temperature=0
         )
 
-        # 지원 자료 추출
         if application_mats:
-            all_mats = pd.DataFrame(application_mats, index=[0])
-            print(all_mats)
-            resume = all_mats['resume_text']
-            cover_letter = all_mats['cover_letter_text']
-            portfolio = all_mats['popol_text']
+            resume = application_mats['resume_text']
+            cover_letter = application_mats['cover_letter_text']
+            portfolio = application_mats['popol_text']
 
         else:
             return "지원 자료 데이터가 존재하지 않습니다."
 
         # 면접 기출 질문 추출
         if prev_questions:
-            all_results = pd.DataFrame(prev_questions)
-            print(all_results)
-            evals = "\n".join([f"{row[0]}" for _, row in all_results.iterrows()])
-            tips = "\n".join([f"{row[1]}" for _, row in all_results.iterrows()])
-            qas = "\n".join([f"{row[2]}" for _, row in all_results.iterrows()])
+            evals = '\n'.join([question['interview_eval'] for question in prev_questions])
+            tips = '\n'.join([question['interview_tip'] for question in prev_questions])
+            qas = '\n'.join([question['interview_qa'] for question in prev_questions])
+
+            # 불필요한 문장 기호 삭제
+            evals = re.sub(r'[\[\]\'\",]', '', evals)
+            tips = re.sub(r'[\[\]\'\",]', '', tips)
+            qas = re.sub(r'[\[\]\'\",]', '', qas)
+
+            user_queries = '\n'.join(user_queries)
             
         else:
             return "면접 기출 질문 데이터가 존재하지 않습니다."
@@ -135,86 +135,62 @@ class GenerateQuestion(post_db_connect):
         # ------- 프롬프트 -------
         # 분야별 질문 생성 규칙
 
-        prompt_content = f"""
-        당신은 AI 면접 질문 생성기입니다.
-        아래의 **질문 생성 규칙**과 **참고 자료**를 바탕으로 **면접 예상 질문 10개**를 생성해주세요.
+        prompt_content = ChatPromptTemplate.from_template(
+            """
+            당신은 AI 면접 질문 생성기입니다.  
+            아래의 **질문 생성 규칙**과 **참고 자료**를 바탕으로, 면접자의 지원 계열에 맞는 규칙을 적용하여 **면접 예상 질문 10개**를 생성해주세요.
 
-        ## [질문 생성 규칙]
-            1. 참고 자료의 면접 기출 질문을 참고하여 질문을 생성하세요.
+            면접자의 지원 자료를 분석해 **지원 직무** 및 **지원 계열**을 판단한 뒤, 해당 계열에 해당하는 질문 생성 규칙을 적용해야 합니다.
 
-            2. 기출 질문과 완전히 동일한 질문은 피하고, 새로운 질문으로 변형하세요.
+            계열 구분은 다음과 같습니다:
+            - 인문 계열: {qa_hum_prompt}
+            - 공학 계열: {qa_eng_prompt}
+            - 예체능 계열: {qa_arts_prompt}
 
-            3. 참고 자료의 면접 팁과 평가 기준을 질문 의도로 설정하세요.
-
-            4. 지원 자료가 있는 경우, 자료를 분석해 진행한 과제나 프로젝트를 추출하고 프로젝트와 관련된 질문을 생성하세요. 질문 하단에 추출한 프로젝트를 명시하세요.
-
-            5. 지원 자료가 있는 경우, 자료를 분석해 희망 직무, 기술스택을 추출하고 기술 관련 질문 생성 시 참고하세요. 질문 하단에 추출한 직무, 기술스택을 명시하세요.
-
-            6. 참고 자료의 면접자 정보에 적합한 질문을 생성하세요.
-
-            7. 각 질문의 질문 의도는 중복되어선 안 되고, 의미가 비슷한 질문은 제외하세요.
-
-            8. 아래 항목에 맞춰 질문 수를 분배하세요:
-
-            * 인성/적성 질문: 2개
-
-            * 기술 관련 질문: 3개
-
-            * 이력서 또는 포트폴리오 기반 질문: 3개
-
-            * 업무 스킬 질문: 2개
-
-            9. 질문 내용 하단에 어떤 기출 질문을 참고했는지 명시해주세요.
-            
-            10. 질문은 아래 형식에 맞춰 출력해주세요:
-                1. 질문 내용
-                2. 질문 내용
-                ...
-                10. 질문 내용
-
-
-        ## [참고 자료]
-        ### 면접 기출 질문:
+            ## [참고자료]
+            ### 1. 면접 기출 질문
             {qas}
 
-        ### 면접 팁:
+            ### 2. 면접 팁
             {tips}
 
-        ### 면접 평가 기준:
+            ### 3. 면접 평가 기준
             {evals}
 
-        ### 지원 자료
-        * 이력서:
+            ### 4. 지원자료
+
+            - **이력서**  
             {resume}
-        
-        * 자기소개서:
+
+            - **자기소개서**  
             {cover_letter}
 
-        * 포트폴리오:
+            - **포트폴리오**  
             {portfolio}
 
-        ### 면접자 정보:
-            {', '.join(user_queries)}
+            ### 5. 면접자 정보
+            {user_queries}
+            """
+        )
 
-        """
+        # response.content 파싱
+        output_parser = StrOutputParser()
 
-        response = llm([HumanMessage(content=prompt_content)])
-        return response.content
+        chain = prompt_content | llm | output_parser
+
+        response = chain.invoke({
+            "qa_hum_prompt": qa_hum_prompt,
+            "qa_eng_prompt": qa_eng_prompt,
+            "qa_arts_prompt": qa_arts_prompt,
+            "qas": qas,
+            "tips": tips,
+            "evals": evals,
+            "resume": resume,
+            "cover_letter": cover_letter,
+            "portfolio": portfolio,
+            "user_queries": user_queries
+        })
+
+        return response
+
     
-
-
-if __name__ == '__main__':
-    # 다른 이력서, 자소서, 포폴 넣었을 때 질문 생성 확인
-    question = GenerateQuestion()
-    company_name = '한섬'
-    job_name = '의류/패션'
-    recruit_gubun = '신입'
-    user_queries = [company_name, job_name, recruit_gubun]
-
-
-    appli_mats = question.get_application_mats_from_db('interview')
-    prev_questions = question.get_prev_questions_from_db(company_name, job_name, recruit_gubun)
-
-    questions = question.generate_question(prev_questions, appli_mats, user_queries)
-
-    print(questions)
