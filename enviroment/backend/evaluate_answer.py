@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from prompt.prompts import ev_hum_prompt, ev_eng_prompt, ev_arts_prompt
+from prompt.prompts import ev_hum_prompt, ev_eng_prompt, ev_arts_prompt, ev_list
 from generate_question import GenerateQuestion
 
 
@@ -24,6 +24,11 @@ from db_util.db_utils import post_db_connect
 
 # ------- 지원자료 데이터 로드 (이력서, 자기소개서, 포트폴리오) -------
 def get_application_mats(user_id):
+    """
+    지원자료 데이터 로드 - 이력서, 자기소개서, 포트폴리오
+
+    :param user_id: 면접자 ID
+    """
     question = GenerateQuestion()
 
     appli_mats = question.get_application_mats_from_db(user_id)
@@ -32,7 +37,11 @@ def get_application_mats(user_id):
 
 # ------- 면접 데이터 로드 (질문, 답변, 권장답변, 답변시간) -------
 def get_interview_data(user_id):
-    
+    """
+    면접 데이터 로드
+
+    :param user_id: 면접자 ID
+    """
     pdb = post_db_connect()
 
     # interview_process 테이블에서 가장 최신 날짜의 interview id 가져오기
@@ -45,21 +54,18 @@ def get_interview_data(user_id):
     """
 
     latest_itv = pdb.select_one(select_latest_query)
-    interview_id = latest_itv['interview_id']
+    # interview_id = latest_itv['interview_id']
 
     # interview_id 로 면접 데이터 가져오기
     select_answer_query = """
-    SELECT ques_text, answer_user_text, answer_example_text, answer_end_time
+    SELECT ques_text, answer_user_text, answer_end_time
     FROM interview_result
-    WHERE interview_id = %s
+    WHERE interview_id = %s and answer_user_text is not null;
     """
 
-    answer = pdb.select_all_vars(select_answer_query, interview_id)[0]
-
-    print(answer)
+    answer = pdb.select_all_vars(select_answer_query, 99)
 
     return answer
-
 
 # ------- 평가지표 세팅 -------
 def evaluate_answers(interview_data, application_mats, user_query):
@@ -87,9 +93,11 @@ def evaluate_answers(interview_data, application_mats, user_query):
 
     # 면접 데이터 분리
     if interview_data:
-        question = interview_data['ques_text']
-        user_answer = interview_data['answer_user_text']
-        answer_time = interview_data['answer_end_time']
+        formatted_data = []
+        for idx, entry in enumerate(interview_data):
+            formatted_data.append(f"질문 {idx+1}: {entry['ques_text']}\n사용자 답변: {entry['answer_user_text']}\n답변 시간: {entry['answer_end_time']}")
+        
+        dataset = '\n\n'.join(formatted_data)
 
     else:
         return "면접 데이터가 존재하지 않습니다."
@@ -102,16 +110,20 @@ def evaluate_answers(interview_data, application_mats, user_query):
         당신은 AI 면접 평가자입니다.
 
         순서대로 면접 평가를 진행하세요.
+        각 질문에 대한 권장답변을 생성하고, 각 답변에 대한 평가를 진행하세요.
+        질문이 10개라면, 10개의 평가가 생성되어야 합니다.
 
         ** 권장답변 생성**:
-        1. 아래의 면접 질문과 사용자 답변을 참고하여 [권장답변 생성규칙]에 따라 먼저 **권장 답변**을 생성하세요.  
+        1. 아래의 [면접 데이터]에서 질문과 사용자 답변을 참고하여 [권장답변 생성규칙]에 따라 먼저 **권장 답변**을 생성하세요.  
         2. 사용자 답변과 권장 답변을 비교하여 각 항목에 대해 자연스러운 문장형 피드백을 작성해주세요.  
         3. 점수는 매기지 말고, 실제 면접관이 해주는 것처럼 진정성 있고 친절하게 작성해주세요.
         
         **면접 답변 평가**:
-        1. 아래의 [면접 질문]을 읽고, 질문의 **의도**를 파악한 뒤
-        2. [평가 항목] 중에서 질문의 의도에 **적합한 항목만 선택하여 평가**해주세요.
-        3. 최종적으로 아래 형식을 참고하여, 각 항목별로 평가를 작성해주세요.
+        1. 아래의 [면접 데이터]에서 질문을 읽고, 질문의 **의도**를 파악한 뒤
+        2. [평가 항목] 중에서 질문의 의도에 **적합한 항목을 찾아** 사용자 답변을 평가해주세요.
+        3. 사용자 답변에서 사용자의 강약점을 파악하여 평가하세요.
+        4. 최종적으로 아래 형식을 참고하여, 각 항목별로 평가를 작성해주세요.
+        5. 평가는 [면접 데이터]의 각 사용자 답변에 대해 진행하세요.
 
         면접자의 [지원정보]를 분석하여 **지원 직무** 및 **지원 계열**을 판단한 뒤, 해당 계열에 해당하는 규칙을 적용해야 합니다.
 
@@ -136,16 +148,11 @@ def evaluate_answers(interview_data, application_mats, user_query):
 
         - **포트폴리오**  
         {portfolio}
-
         ---
-        [면접 질문]:
-        {question}
 
-        [사용자 답변]:
-        {user_answer}
-
-        [답변 시간]:
-        {answer_time}
+        [면접 데이터]
+        각 면접 질문에 대한 사용자 답변을 평가해 주세요.:\n\n
+        {dataset}
         ---
 
         [권장답변 생성규칙]
@@ -155,55 +162,41 @@ def evaluate_answers(interview_data, application_mats, user_query):
         4. 직업명은 보편적으로 사용하는 명칭을 사용하세요.
         ---
         [평가 항목]
-
-        1. 논리성 (Logical Coherence)  
-        - 답변이 논리적으로 구성되었는가?  
-        - 문장 간의 연결이 자연스러운가?
-
-        2. 질문 이해도 (Question Comprehension)  
-        - 질문의 핵심 의도를 정확히 이해하고 답변했는가?
-
-        3. 직무 전문성 (Job-Related Expertise)
-        - 직무역량 질문인 경우에만 평가하세요.
-        - 직무와 관련된 지식 또는 경험을 구체적으로 언급했는가?
-
-        4. 표현 습관 (Speech Habits)  
-        - 반복되는 말버릇, 불필요한 표현 또는 과장된 표현이 있었는가?
-
-        5. 시간 활용력 (Time Management)  
-        - 90초 이내에 핵심 내용을 명확히 전달했는가?  
-        - 20초 미만이거나 90초를 초과하는 경우 감점 요인
-
-        6. 전달력 (Clarity of Delivery)  
-        - 전달하는 내용이 명확하고 이해하기 쉬웠는가?
-
-        7. 자기표현력 (Self-Presentation)
-        - 의사소통 능력 질문인 경우에만 평가하세요.  
-        - 자신에 대한 표현이 진정성 있고 긍정적이었는가?
+        {ev_list}
 
         [평가 방식]  
-        - 질문에 적합한 항목만 평가
-        - 각 항목에 대해 간결한 문장으로 피드백 작성
+        - 각 답변에 대한 평가 진행
+        - 각 항목에 대해 200자 이하의 간결한 문장으로 피드백 작성
         ---
 
         [출력 형식 예시]
         다음 형식의 JSON으로 응답해주세요:
 
         {{
-        "권장답변": "...",
-        "피드백": {{
-            "논리성": "...",
-            "질문 이해도": "...",
-            "직무 전문성": "...",
-            "표현 습관": "...",
-            "시간 활용력": "...",
-            "전달력": "...",
-            "자기표현력": "..."
-        }},
-        "총평": "..."
+        "질문1": {{
+            "권장답변": "...",
+            "피드백": {{
+                "논리성": "...",
+                "질문 이해도": "...",
+                "직무 전문성": "...",
+                "표현 습관": "...",
+                "시간 활용력": "..."
+            }},
+            "총평": "..."
+            }},
+        "질문2:" {{
+            "권장답변": "...",
+            "피드백": {{
+                "논리성": "...",
+                "질문 이해도": "...",
+                "직무 전문성": "...",
+                "표현 습관": "...",
+                "시간 활용력": "..."
+            }},
+            "총평": "..."
+            }},
+        ...
         }}
-        ※ 각 피드백 항목은 질문에 적합한 항목에 대해서만 작성해주세요.
-        ※ 작성하지 않을 항목은 null 값으로 두어도 됩니다.
         ※ 전체 구조가 JSON으로 유효하게 닫히도록 작성해주세요.
 
         """
@@ -224,15 +217,19 @@ def evaluate_answers(interview_data, application_mats, user_query):
         'resume': resume,
         'cover_letter': cover_letter,
         'portfolio': portfolio,
-        'question': question,
-        'user_answer': user_answer,
-        'answer_time': answer_time
+        'dataset': dataset,
+        'ev_list': ev_list
     })
 
     return response
 
-# 권장 답변 생성하여 RDB 저장
-def save_example_answer(response):
+# 생성된 평가 및 권장답변 RDB 저장
+def save_generated_evals(response):
+    # 권장 답변 저장
+
+    # 피드백 저장
+
+    # 총평 저장
     pass
 
 
@@ -248,4 +245,4 @@ def save_example_answer(response):
 
 #     results = evaluate_answers(interview_data, appli_mats, user_queries)
 
-#     print(results['피드백'])
+#     print(results)
