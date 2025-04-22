@@ -30,7 +30,7 @@ def get_company_list():
 
 
 @router.get('/get_job_list', status_code=200)
-def get_company_list():
+def get_job_list():
     connect = post_db_connect()
     result = connect.select_all("""select jcmt.common_id as common_id,
                                           jcmt.common_nm as common_nm

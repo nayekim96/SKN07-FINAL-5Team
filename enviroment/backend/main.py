@@ -51,3 +51,11 @@ def get_health() -> HealthCheck:
         HealthCheck: Returns a JSON response with the health status
     """
     return HealthCheck(status="OK")
+
+# @app.post("/query", status_code=200)
+# async def query(data:Model~~~):
+#     retriever = get_retriever(retriever_type)
+#     model = get_models(model_name)
+#     chain = retriever | prompt | model | stroutputparser()
+#     res = chain.invoke()
+#     return 0

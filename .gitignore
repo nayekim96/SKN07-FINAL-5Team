@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# data
+enviroment/data_backup/
+chroma_data/
+data/

@@ -7,6 +7,8 @@ import openai
 import os
 from dotenv import load_dotenv
 
+
+load_dotenv()
 # OpenAI API 키 설정
 openai.api_key = os.environ.get('OPENAI_API_KEY')
 client = openai.OpenAI()
@@ -58,7 +60,7 @@ def main():
     st.write(st.session_state.webcam_bool)
 
     # ##### 임시!!!! 웹캠 테스트 강제 완료 설정
-    # st.session_state.webcam_bool = True
+    st.session_state.webcam_bool = True
 
     if not webcam.isOpened() and st.session_state.webcam_bool == False:
         webcam_placeholder.write('1. 웹캠 테스트 :no_entry_sign:')
@@ -72,8 +74,6 @@ def main():
     # container = st.container()
 
     st.write('테스트')
-
-
     
     if st.session_state.test_count == 0:
         # 컨테이너 내부 UI 요소를 비우기 위한 empty() 객체

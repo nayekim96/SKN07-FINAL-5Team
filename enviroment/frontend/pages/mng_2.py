@@ -21,10 +21,6 @@ top_dir = os.path.abspath(os.path.join(main_dir, ".."))
 if top_dir not in sys.path:
     sys.path.append(top_dir)
 
-# 면접 질문 생성 class import
-# from backend.generate_question import GenerateQuestion
-# question = GenerateQuestion()
-
 # --------- sidebar 호출 ---------
 st.set_page_config(layout="wide")
 show_sidebar()
@@ -108,6 +104,7 @@ else:
 
 with col2:
     if st.button("입력 완료"):
+
         # 기업 확인
         if company_name == common_select_text:
             company_placeholder.warning('기업을 선택해주세요!' , icon="⚠️")
@@ -126,12 +123,6 @@ with col2:
             job_nm = st.session_state['job_name']
             experience = st.session_state['experience']
 
-            # 지원자료, 면접 후기 데이터 로드
-            #applications = question.get_application_mats_from_db(user_id='interview')
-            #prev_questions = question.get_prev_questions_from_db(company_nm, job_nm, experience)
-
-            # 질문 생성 후 session에 저장
-            #st.session_state['new_questions'] = question.generate_question(prev_questions, applications)
             post_data = { "company_nm" : str(company_nm),
                           "job_nm" : str(job_nm),
                           "experience": str(experience)
