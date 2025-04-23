@@ -79,6 +79,9 @@ for interview in interviews:
 
             print(evals)
 
+            st.session_state['interview_data'] = interview_data
+            print(st.session_state['interview_data'])
+
             st.session_state['evaluations'] = evals
 
             # 종합 피드백

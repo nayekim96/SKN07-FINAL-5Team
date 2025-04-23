@@ -15,7 +15,7 @@ class Backend:
             else:
                 res = requests.get(url=self.API_URL+URL)
             res.raise_for_status()
-            return res
+            return res.json()
         except requests.exceptions.RequestException as e:
             return {'message': str(e), 'status_code': getattr(e.response, 'status_code', 'unknown')}
         
@@ -28,7 +28,7 @@ class Backend:
             else:
                 res = requests.post(url=self.API_URL+URL, data=data)
             res.raise_for_status()
-            return res
+            return res.json()
         except requests.exceptions.RequestException as e:
             return {'message': str(e), 'status_code': getattr(e.response, 'status_code', 'unknown')}
         

@@ -1,5 +1,6 @@
 from utils.backend import Backend
 
+
 class Mock_interview(Backend):
     def __init__(self):
         super().__init__()
@@ -7,9 +8,11 @@ class Mock_interview(Backend):
     def get_company_list(self):
         URL = '/mock/itv/get_company_list'
         result = self.req_get(URL)
-        return result.json()
+        print(result)
+        return result
     
     def get_job_list(self):
         URL = '/mock/itv/get_job_list'
         result = self.req_get(URL)
-        return result.json()
+        print(result)
+        return result

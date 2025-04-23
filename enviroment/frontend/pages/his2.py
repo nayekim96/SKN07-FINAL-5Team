@@ -1,5 +1,10 @@
+import os
+import sys
 import streamlit as st
 from sidebar import show_sidebar
+
+
+
 
 st.set_page_config(layout="wide")
 show_sidebar()
@@ -80,16 +85,17 @@ if "selected_interview" not in st.session_state:
 
 interview = st.session_state["selected_interview"]
 
+if "interview_data" not in st.session_state:
+    st.session_state["interview_data"] = {
+        "question_text": "데이터가 존재하지 않습니다.",
+        "answer_all_review": "데이터가 존재하지 않습니다."
+    }
+
+evaluations = st.session_state["evaluations"]
+
 if "evaluations" not in st.session_state:
     st.session_state["evaluations"] = {
         "answer_example_text": "데이터가 존재하지 않습니다.",
-        "feedback": {
-            "answer_logic": "...",
-            "q_comp": "...",
-            "job_exp": "...",
-            "hab_chk": "...",
-            "time_mgmt": "..."
-        },
         "answer_all_review": "데이터가 존재하지 않습니다."
     }
 

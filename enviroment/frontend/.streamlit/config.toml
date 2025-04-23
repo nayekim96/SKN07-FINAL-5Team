@@ -1,0 +1,6 @@
+[theme]
+primaryColor = "#63a0f0"      # 원하는 주요 색상 (예: 파란색)
+backgroundColor = "#ffffff"   # 배경 색상
+secondaryBackgroundColor = "#dfedfe"  # 사이드바 등 보조 배경
+textColor = "#404040"         # 텍스트 색상
+font = "sans serif"           # 또는 "monospace", "serif"
