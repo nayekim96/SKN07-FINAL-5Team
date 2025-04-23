@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from prompt.prompts import qa_hum_prompt, qa_eng_prompt, qa_arts_prompt
+from .prompt.prompts import qa_hum_prompt, qa_eng_prompt, qa_arts_prompt
 
 
 load_dotenv()
@@ -191,6 +191,26 @@ class GenerateQuestion(post_db_connect):
             "user_queries": user_queries
         })
 
-        return response
+        qs_list = response.split('\n')
+
+        return qs_list
+    
+
+# if __name__ == '__main__':
+#     question = GenerateQuestion()
+
+#     company_name = '네이버'
+#     job_name = 'IT/개발/데이터'
+#     experience = '신입'
+
+#     user_queries = [company_name, job_name, experience]
+
+#     appli_mats = question.get_application_mats_from_db('interview')
+#     prev_quesions = question.get_prev_questions_from_db(company_name, job_name, experience)
+
+#     results = question.generate_question(prev_quesions, appli_mats, user_queries)
+
+#     parsed = results.split('\n')
+#     print(parsed)
 
     
