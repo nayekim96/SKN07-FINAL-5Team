@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from .prompt.prompts import ev_total_list
+from prompt.prompts import ev_score_rule, ev_total_list
 
 load_dotenv()
 
@@ -56,7 +56,6 @@ def get_all_reviews(user_id):
     """
 
     reviews = pdb.select_all_vars(select_answer_query, interview_id)
-    print(reviews)
 
     return reviews
 
@@ -132,6 +131,10 @@ def total_report(reviews):
         ---
 
         [평가 항목 및 기준]
+        - 평가 기준:
+        {ev_score_rule}
+
+        - 평가 항목:
         {ev_total_list}
 
         ---
@@ -165,7 +168,6 @@ def total_report(reviews):
         }}
         """
     )
-
     output_parser = JsonOutputParser()
 
     chain = prompt | llm | output_parser
@@ -177,6 +179,7 @@ def total_report(reviews):
         "job_exp": job_exp,
         "hab_chk": hab_chk,
         "time_mgmt": time_mgmt,
+        "ev_score_rule": ev_score_rule,
         "ev_total_list": ev_total_list
     })
 

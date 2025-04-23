@@ -1,7 +1,5 @@
 # 면접관리 Routers
 from fastapi import APIRouter
-from schemas.mng_q_schemas import MngQuestionSchema as MngQschema
-from generate_question import GenerateQuestion
 
 router = APIRouter(prefix="/mng")
 
@@ -15,3 +13,5 @@ def get_question(data:MngQschema):
     
     # 질문 생성 후 session에 저장
     return question.generate_question(prev_questions, applications, user_queries)
+  
+router = APIRouter(prefix="/mng")
