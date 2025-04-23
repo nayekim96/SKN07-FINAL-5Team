@@ -15,19 +15,20 @@ class Backend:
             else:
                 res = requests.get(url=self.API_URL+URL)
             res.raise_for_status()
-            return res
+            return res.json()
         except requests.exceptions.RequestException as e:
-            return {'message' : e, 'status_code': res.status_code}
+            return {'message': str(e), 'status_code': getattr(e.response, 'status_code', 'unknown')}
         
     
-    def req_post(self, URL:str, data:dict, **headers):
+    def req_post(self, URL:str, data:dict, headers:dict):
         try:
             res = None
             if headers:
-                res = requests.post(url=self.API_URL+URL, data=data,headers=headers)
+                res = requests.post(url=self.API_URL+URL, json=data,headers=headers)
             else:
                 res = requests.post(url=self.API_URL+URL, data=data)
             res.raise_for_status()
-            return res
+            return res.json()
         except requests.exceptions.RequestException as e:
-            return {'message' : e, 'status_code': res.status_code}
+            return {'message': str(e), 'status_code': getattr(e.response, 'status_code', 'unknown')}
+        

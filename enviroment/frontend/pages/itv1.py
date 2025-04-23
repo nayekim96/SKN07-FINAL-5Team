@@ -3,7 +3,6 @@ import streamlit as st
 import time
 from sidebar import show_sidebar
 
-
 st.set_page_config(layout="wide",
                    initial_sidebar_state="collapsed")
 
