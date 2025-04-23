@@ -186,10 +186,10 @@ def total_report(reviews):
     return response
 
 
-if __name__ == '__main__':
-    reviews = get_all_reviews('interview')
-    feedbacks = total_report(reviews)
+# if __name__ == '__main__':
+#     reviews = get_all_reviews('interview')
+#     feedbacks = total_report(reviews)
 
-    print(feedbacks)
+#     print(feedbacks)
 
     
