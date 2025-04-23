@@ -10,6 +10,8 @@ import uuid
 from datetime import datetime
 from evaluate_answer import get_application_mats, evaluate_answers 
 import psycopg2.extras
+from create_total_report import total_report
+
 
 load_dotenv()
 # OpenAI API 키 설정
@@ -138,13 +140,23 @@ def interview_result_process(data: ItvResultProcessSchema):
                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                                """
         eval_insert_list = []
+        report_data = []
+        
+        eval_input_data = [{'ques_text' : question, 'answer_user_text' : answer_list[idx], 'answer_end_time': 90} for idx, question enumerate(question_list)]
+
+
+        eval_list = evaluate_answers(eval_input_data ,mats, user_query)
+        
+
+
+
         for idx, question in enumerate(question_list):
             answer = answer_list[idx]
             interview_data = { "ques_text" : question,
                                "answer_user_text" : answer,
                                "answer_end_time" : 90 
                              }
-
+            
             eval_result = evaluate_answers(interview_data, mats, user_query) 
             feedback = eval_result['피드백']
             answer_logic = null_and_exist_check(feedback, '논리성')
@@ -152,12 +164,28 @@ def interview_result_process(data: ItvResultProcessSchema):
             job_exp = null_and_exist_check(feedback, '직무 전문성')
             hab_chk = null_and_exist_check(feedback, '표현 습관')
             time_mgmt = null_and_exist_check(feedback, '시간 활용력')
-            eval_data = tuple([data.interview_id, (idx+1), question, answer, eval_result['권장답변'], 90, eval_result['총평'], answer_logic, q_comp, job_exp, hab_chk, time_mgmt])
+            answer_all_review = eval_result['총평']    
+        
+            eval_data = tuple([data.interview_id, (idx+1), question, answer, eval_result['권장답변'], 90, answer_all_review, answer_logic, q_comp, job_exp, hab_chk, time_mgmt])
+            
             eval_insert_list.append(eval_data)
+            
+            review_data = {'answer_logic' : answer_logic,
+                           'q_comp' : q_comp,
+                           'job_exp' : job_exp,
+                           'hab_chk' : hab_chk,
+                           'time_mgmt' : time_mgmt,
+                           'answer_all_review' : answer_all_review
+                          }
+            report_data.append(review_data)
+            
 
         for result_data in eval_insert_list:
             connect.cursor.execute(result_insert_query, result_data)
+       
+         
         
+
     except Exception as e:
         print(e)
         status = "error"
