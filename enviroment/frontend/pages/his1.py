@@ -3,8 +3,17 @@ import sys
 import streamlit as st
 from datetime import datetime # 나중에 datetime 쓸거 같아서 넣어놓음
 from sidebar import show_sidebar
-from utils.history_service import History_service
 
+# --------- IMPORT CLASS FROM OTHER DIRS ----------
+# 현재 파일의 디렉토리 경로
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 상위 디렉토리 (/enviroment/frontend)
+main_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if main_dir not in sys.path:
+    sys.path.append(main_dir)
+
+from utils.history_service import History_service
 
 hs = History_service()
 

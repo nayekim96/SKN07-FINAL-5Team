@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from .prompt.prompts import ev_score_rule, ev_total_list
+from prompt.prompts import ev_score_rule, ev_total_list
 
 load_dotenv()
 

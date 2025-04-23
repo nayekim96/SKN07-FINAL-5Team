@@ -1,5 +1,16 @@
 # 면접히스토리 Routers
+import os
+import sys
 from fastapi import APIRouter
+# --------- IMPORT CLASS FROM OTHER DIRS ----------
+# 현재 파일의 디렉토리 경로
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 상위 디렉토리 (/enviroment/frontend)
+main_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if main_dir not in sys.path:
+    sys.path.append(main_dir)
+
 from schemas.history_schemas import HisBoardSchema
 from db_util.db_utils import post_db_connect 
 import math

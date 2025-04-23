@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from .prompt.prompts import ev_hum_prompt, ev_eng_prompt, ev_arts_prompt, ev_list
-from .generate_question import GenerateQuestion
+from prompt.prompts import ev_hum_prompt, ev_eng_prompt, ev_arts_prompt, ev_list
+from generate_question import GenerateQuestion
 
 
 load_dotenv()

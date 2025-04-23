@@ -3,7 +3,30 @@ import sys
 import streamlit as st
 from sidebar import show_sidebar
 
+# --------- IMPORT CLASS FROM OTHER DIRS ----------
+# 현재 파일의 디렉토리 경로
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
+# 상위 디렉토리 (/enviroment/frontend)
+main_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if main_dir not in sys.path:
+    sys.path.append(main_dir)
+
+from utils.history_service import History_service
+
+hs = History_service()
+
+if "page_num" not in st.session_state:
+    st.session_state.page_num = 1
+
+def get_history_list():
+    req_data = { "user_id" : 'interview',
+                 "page_num" : st.session_state['page_num'] }
+
+    headers = {'accept': 'application/json',
+               'Content-Type':'application/json; charset=utf-8'}
+
+    return hs.get_history_list(req_data, headers)
 
 
 st.set_page_config(layout="wide")
@@ -77,49 +100,61 @@ st.title("히스토리 - 종합 레포트")
 if st.button("⬅ 면접 히스토리로 돌아가기"):
     st.switch_page("pages/his1.py")
 
+history_info = get_history_list()
+
+interviews = history_info['history_data']
+
+print(interviews)
+
+# interview_id = st.session_state["history_interview_id"]
+
+interview = next(item for item in interviews if item['interview_id'] == 116)
+
+print(interview)
+
 # 데이터 불러오기
-if "selected_interview" not in st.session_state:
-    st.session_state["selected_interview"] = {
-        "title": "데이터 없음", "date": "N/A", "company": "N/A", "role": "N/A", "level": "N/A"
-    }
+# if "selected_interview" not in st.session_state:
+#     st.session_state["selected_interview"] = {
+#         "title": "데이터 없음", "date": "N/A", "company": "N/A", "role": "N/A", "level": "N/A"
+#     }
 
-interview = st.session_state["selected_interview"]
+# interview = st.session_state["selected_interview"]
 
-if "interview_data" not in st.session_state:
-    st.session_state["interview_data"] = {
-        "question_text": "데이터가 존재하지 않습니다.",
-        "answer_all_review": "데이터가 존재하지 않습니다."
-    }
+# if "interview_data" not in st.session_state:
+#     st.session_state["interview_data"] = {
+#         "question_text": "데이터가 존재하지 않습니다.",
+#         "answer_all_review": "데이터가 존재하지 않습니다."
+#     }
 
-evaluations = st.session_state["evaluations"]
+# evaluations = st.session_state["evaluations"]
 
-if "evaluations" not in st.session_state:
-    st.session_state["evaluations"] = {
-        "answer_example_text": "데이터가 존재하지 않습니다.",
-        "answer_all_review": "데이터가 존재하지 않습니다."
-    }
+# if "evaluations" not in st.session_state:
+#     st.session_state["evaluations"] = {
+#         "answer_example_text": "데이터가 존재하지 않습니다.",
+#         "answer_all_review": "데이터가 존재하지 않습니다."
+#     }
 
-evaluations = st.session_state["evaluations"]
+# evaluations = st.session_state["evaluations"]
 
-if "total_evaluations" not in st.session_state:
-    st.session_state["total_evaluations"] = {
-        "answer_all_review": "데이터가 존재하지 않습니다.",
-        "score": {
-            "qs_relevance": "N/A",
-            "clarity": "N/A",
-            "job_relevance": "N/A"
-        },
-        "answer_logic": "...",
-        "q_comp": "...",
-        "job_exp": "...",
-        "hab_chk": "...",
-        "time_mgmt": "..."
-    }
+# if "total_evaluations" not in st.session_state:
+#     st.session_state["total_evaluations"] = {
+#         "answer_all_review": "데이터가 존재하지 않습니다.",
+#         "score": {
+#             "qs_relevance": "N/A",
+#             "clarity": "N/A",
+#             "job_relevance": "N/A"
+#         },
+#         "answer_logic": "...",
+#         "q_comp": "...",
+#         "job_exp": "...",
+#         "hab_chk": "...",
+#         "time_mgmt": "..."
+#     }
 
-total_evaluations = st.session_state["total_evaluations"]
+# total_evaluations = st.session_state["total_evaluations"]
 
-st.write(f"###  {interview['company']} - {interview['role']} ({interview['level']})")
-st.write(f"면접 날짜: {interview['date']}")
+st.write(f"### {interview['company_name']} - {interview['job_name']} ({interview['person_exp']})")
+st.write(f"면접 날짜: {interview['insert_date']}")
 
 # 탭 구성
 tab1, tab2 = st.tabs(["종합 레포트", "상세 레포트"])
@@ -130,12 +165,11 @@ with tab1:
 
     # 영역별 점수
     scores = {
-            "질문 적합성": total_evaluations['score']['qs_relevance'],
-            "논리성과 구체성": total_evaluations['score']['clarity'],
-            "직무 연관성": total_evaluations['score']['job_relevance']
-            }
+            "질문 적합성": "...",
+            "논리성과 구체성": "...",
+            "직무 연관성": "..."}
     
-    answer_all_review = total_evaluations['answer_all_review']
+    answer_all_review = "..."
 
     with col1:
         st.write("<p class='section-title'>영역별 점수</p>", unsafe_allow_html=True)
@@ -154,11 +188,11 @@ with tab1:
 
     # 평가기준별 총평
     reviews = {
-        "논리성": total_evaluations['answer_logic'],
-        "질문 이해도": total_evaluations['q_comp'],
-        "직무 전문성": total_evaluations['job_exp'],
-        "습관 체크": total_evaluations['hab_chk'],
-        "시간 활용도": total_evaluations['time_mgmt']
+        "논리성": "...",
+        "질문 이해도": "...",
+        "직무 전문성": "...",
+        "습관 체크": "...",
+        "시간 활용도": "..."
     }
 
     col1, col2 = st.columns([1, 2])
@@ -200,5 +234,3 @@ with tab2:
     # 오른쪽 컬럼: 메모 입력
     with col2:
         memo = st.text_area("✍️ 면접 메모")
-
-
