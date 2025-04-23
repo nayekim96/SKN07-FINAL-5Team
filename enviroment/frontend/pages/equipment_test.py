@@ -73,7 +73,7 @@ def main():
     # # 컨테이너 생성
     # container = st.container()
 
-    
+    st.write('테스트')
     
     if st.session_state.test_count == 0:
         # 컨테이너 내부 UI 요소를 비우기 위한 empty() 객체
@@ -175,13 +175,6 @@ def speak_test():
             speaker_placeholder.write("3. 스피커 테스트 :white_check_mark:")
         st.session_state.speaker_bool = True
 
-
-
-def test_done():
-    if st.button('테스트 완료'):
-        time.sleep(1)
-        st.switch_page("pages/mng_2.py")
-
 if __name__ == "__main__":
     #st.switch_page("pages/mng_2.py")
     main()
@@ -194,8 +187,8 @@ if __name__ == "__main__":
         with col1:
             st.write("테스트가 완료되었으면 준비완료 버튼을 클릭하세요")
         with col2:
-            if st.button('테스트 완료', key="test_done"):
+            if st.button('테스트 완료'):
                 time.sleep(1)
 
-                st.switch_page("pages/itv1.py")
+                st.switch_page("pages/itv.py")
 

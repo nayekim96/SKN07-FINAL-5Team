@@ -41,6 +41,8 @@ COPY --chown=encore:encore ./backend_requirement.txt /home/encore/
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir --upgrade -r backend_requirement.txt
 
+RUN mkdir ./data
+
 # 애플리케이션이 수신 대기하는 포트를 설정
 EXPOSE 9999
 

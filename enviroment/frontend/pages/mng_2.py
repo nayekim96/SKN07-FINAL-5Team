@@ -21,16 +21,13 @@ top_dir = os.path.abspath(os.path.join(main_dir, ".."))
 if top_dir not in sys.path:
     sys.path.append(top_dir)
 
-# 면접 질문 생성 class import
-from backend.generate_question import GenerateQuestion
-
 # --------- sidebar 호출 ---------
 st.set_page_config(layout="wide")
 show_sidebar()
 
 # --------- CSS (상단 여백 제거) ---------
 st.markdown(
-    """
+        """
         <style>
                 .stAppHeader {
                     background-color: rgba(255, 255, 255, 0.0);  /* Transparent background */
@@ -46,16 +43,18 @@ st.markdown(
                 [data-testid="stSidebarNav"] {display: none;}
         </style>
         """,
-    unsafe_allow_html=True,
-)
+        unsafe_allow_html=True,
+        )
 
 def set_company_job_info():
     """
     기업/직무/경력 정보 세션 저장
     """
     st.session_state['company_name'] = company_name
+    st.session_state['company_cd'] = company_list[company_name]
     st.session_state['job_name'] = job_title
     st.session_state['experience'] = experience_years
+    st.session_state['job_cd'] = job_list[job_title]
     if experience_years == '경력':
         st.session_state['experience_year'] = experience_placeholder
 
@@ -124,20 +123,14 @@ with col2:
             job_nm = st.session_state['job_name']
             experience = st.session_state['experience']
 
-            user_queries = [company_nm, job_nm, experience]
+            post_data = { "company_nm" : str(company_nm),
+                          "job_nm" : str(job_nm),
+                          "experience": str(experience)
+                        }
 
-            # 답변 평가 시 활용 예정
-            st.session_state['user_queries'] = user_queries
-
-            question = GenerateQuestion()
-
-            # 지원자료, 면접 후기 데이터 로드
-            application_mats = question.get_application_mats_from_db('interview')
-            prev_questions = question.get_prev_questions_from_db(company_nm, job_nm, experience)
-
-            # 질문 생성 후 session에 저장
-            st.session_state['new_questions'] = question.generate_question(prev_questions, application_mats, user_queries)
-
+            headers = {'accept': 'application/json',
+                       'Content-Type':'application/json; charset=utf-8'}
+            st.session_state['new_questions'] = interview.get_question_list(post_data, headers) 
             #장비테스트 페이지 이동
             st.switch_page("pages/equipment_test.py")
 
