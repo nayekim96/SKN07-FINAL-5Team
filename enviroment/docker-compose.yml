@@ -14,6 +14,23 @@ services: # 컨테이너 설정
       mynet:
         # ip 설정
         ipv4_address: 172.30.0.20
+    # 비디오 세팅 시 주석 해제
+    environment:
+      # - ALSA_CARD=Loopback   # 가상 카드 이름 지정
+      - ALSA_PCM="hw:0,0"
+      - DISPLAY=${DISPLAY}
+    devices:
+      - /dev/video0:/dev/video0
+      - /dev/snd:/dev/snd
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/dbus/:/run/dbus/ 
+      - /dev/shm:/dev/shm 
+      - datadir:/home/encore/data
+      # - "./asound.conf:/etc/asound.conf:ro" # ro는 읽기 전용을 의미
+      # - /usr/share/alsa:/usr/share/alsa:ro
+    group_add:
+      - "63"
     develop:
       # 로컬에서 수정 시 동기화 작업
       # path : 경로
@@ -39,6 +56,8 @@ services: # 컨테이너 설정
     networks:
       mynet:
         ipv4_address: 172.30.0.21
+    volumes:
+      - datadir:/home/encore/data
     develop:
       watch:
         - action: sync
@@ -47,37 +66,34 @@ services: # 컨테이너 설정
           ignore: 
             - frontend/
             
-  chroma:
-    image: chromadb/chroma:latest 
-    volumes:
+  #chroma:
+  #  image: chromadb/chroma:latest 
+  #  volumes:
       # The default config specifies a persist_directory of /data.
       # Read more about deployments: https://docs.trychroma.com/deployment
-      - chroma-data:/data\
-    ports:
-      - "8000:8000"
-    healthcheck:
-      # Adjust below to match your container port
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v2/heartbeat" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    networks:
-      - mynet
+  #     - chroma-data:/data\
+  #  ports:
+  #    - "8000:8000"
+  #  healthcheck:
+  #    # Adjust below to match your container port
+  #    test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v2/heartbeat" ]
+  #    interval: 30s
+  #    timeout: 10s
+  #    retries: 3
+  #  networks:
+  #    - mynet
   
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:latest
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - xpack.security.transport.ssl.enabled=false
-    ports:
-      - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-
-volumes:
-  esdata:
+  #elasticsearch:
+  #  image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+  #  container_name: elasticsearch
+  #  environment:
+  #    - discovery.type=single-node
+  #    - xpack.security.enabled=false
+  #    - xpack.security.transport.ssl.enabled=false
+  #  ports:
+  #    - "9200:9200"
+  #  volumes:
+  #    - esdata:/usr/share/elasticsearch/data
   
 networks:
   # compose 파일에서 사용할 network 설정
@@ -88,5 +104,7 @@ networks:
     external: true
 
 volumes:
-  chroma-data:
-    driver: local
+  datadir:
+  #esdata:
+  #chroma-data:
+  #  driver: local
