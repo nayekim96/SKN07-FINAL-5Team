@@ -77,11 +77,15 @@ for interview in interviews:
 
             evals = evaluate_answers(interview_data, appli_mats, user_queries)
 
+            print(evals)
+
             st.session_state['evaluations'] = evals
 
             # 종합 피드백
             reviews = get_all_reviews('interview')
             total_evals = total_report(reviews)
+
+            print(total_evals)
 
             st.session_state['total_evaluations'] = total_evals
 
