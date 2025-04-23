@@ -8,8 +8,8 @@ import openai
 import os
 import uuid 
 from datetime import datetime
-
-
+from evaluate_answer import get_application_mats, evaluate_answers 
+import psycopg2.extras
 
 load_dotenv()
 # OpenAI API 키 설정
@@ -79,7 +79,95 @@ def interview_start(data: ItvProcessSchema):
 
 @router.post('/interview_result_process', status_code=200)
 def interview_result_process(data: ItvResultProcessSchema):
-    pass
+    def null_and_exist_check(feedback_dict:dict, key:str):
+        if key in feedback_dict:
+            if feedback_dict[key] is None:
+                return "null"
+            else:
+                return feedback_dict[key]
+        else:
+            return "null"
+            
+    status = ""        
+
+    try:
+        connect = post_db_connect()
+
+        user_id_select_query = f""" select user_id 
+                                    from interview_process
+                                    where interview_id = '{data.interview_id}'
+                                """
+        
+        user_info = connect.select_one(user_id_select_query)
+        user_id = user_info['user_id'] 
+
+        user_info_select_query = f"""with base_data as (
+                                        select ip.company_nm ,
+                                               ip.kewdcdno,
+                                               ip.person_exp
+                                        from interview_process ip 
+                                        where ip.interview_id = '{data.interview_id}'
+                                    ), select_company as (
+                                        select bd.person_exp,
+                                               bd.kewdcdno,
+                                               ccmt.common_nm
+                                        from base_data  as bd
+                                        join  company_code_master_tbl ccmt  
+                                        on cast(bd.company_nm as integer) = ccmt.common_id
+                                    ), select_job as (
+                                        select sc.common_nm as company_name,
+                                                sc.person_exp,
+                                                jcmt.common_nm as job_name
+                                        from select_company as sc
+                                        join job_code_master_tbl jcmt 
+                                        on sc.kewdcdno = jcmt.common_id
+                                    ) 
+                                    select *
+                                    from select_job;
+                                """
+        
+        user_query_info = connect.select_one(user_info_select_query)
+
+        mats = get_application_mats(user_id)
+        
+        question_list = data.question_list
+        answer_list = data.answer_list
+        user_query = [user_query_info['company_name'], user_query_info['job_name'], user_query_info['person_exp']]
+
+        result_insert_query = f""" INSERT INTO interview_result (interview_id, ques_step, ques_text, answer_user_text, answer_example_text, answer_end_time, answer_all_review, answer_logic, q_comp, job_exp, hab_chk, time_mgmt )
+                                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                               """
+        eval_insert_list = []
+        for idx, question in enumerate(question_list):
+            answer = answer_list[idx]
+            interview_data = { "ques_text" : question,
+                               "answer_user_text" : answer,
+                               "answer_end_time" : 90 
+                             }
+
+            eval_result = evaluate_answers(interview_data, mats, user_query) 
+            feedback = eval_result['피드백']
+            answer_logic = null_and_exist_check(feedback, '논리성')
+            q_comp = null_and_exist_check(feedback, '질문 이해도')
+            job_exp = null_and_exist_check(feedback, '직무 전문성')
+            hab_chk = null_and_exist_check(feedback, '표현 습관')
+            time_mgmt = null_and_exist_check(feedback, '시간 활용력')
+            eval_data = tuple([data.interview_id, (idx+1), question, answer, eval_result['권장답변'], 90, eval_result['총평'], answer_logic, q_comp, job_exp, hab_chk, time_mgmt])
+            eval_insert_list.append(eval_data)
+
+        for result_data in eval_insert_list:
+            connect.cursor.execute(result_insert_query, result_data)
+        
+    except Exception as e:
+        print(e)
+        status = "error"
+    finally:
+        connect.db.commit()
+        connect.close()
+        status = "ok"
+
+    res_data = {"status" : status}
+    return res_data
 
 
 def common_select_process(select_list:dict, key:str, value: str, list_nm: str):
