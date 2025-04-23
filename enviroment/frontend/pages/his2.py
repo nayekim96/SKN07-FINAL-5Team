@@ -37,6 +37,39 @@ if "selected_interview" not in st.session_state:
 
 interview = st.session_state["selected_interview"]
 
+if "evaluations" not in st.session_state:
+    st.session_state["evaluations"] = {
+        "권장답변": "데이터가 존재하지 않습니다.",
+        "피드백": {
+            "논리성": "...",
+            "질문 이해도": "...",
+            "직무 전문성": "...",
+            "표현 습관": "...",
+            "시간 활용력": "..."
+        },
+        "총평": "데이터가 존재하지 않습니다."
+    }
+
+evaluations = st.session_state["evaluations"]
+
+if "total_evaluations" not in st.session_state:
+    st.session_state["total_evaluations"] = {
+        "총평": "데이터가 존재하지 않습니다.",
+        "점수": {
+            "질문 적합성": "N/A",
+            "논리성과 구체성": "N/A",
+            "직무 연관성": "N/A"
+        },
+        "논리성": "...",
+        "질문 이해도": "...",
+        "직무 전문성": "...",
+        "표현 습관": "...",
+        "시간 활용력": "..."
+        
+    }
+
+total_evaluations = st.session_state["total_evaluations"]
+
 st.write(f"###  {interview['company']} - {interview['role']} ({interview['level']})")
 st.write(f"면접 날짜: {interview['date']}")
 
