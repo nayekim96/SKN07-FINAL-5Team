@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class ItvProcessSchema(BaseModel):
     user_id:str
-    question_list:str
+    question_list:list
     company_cd:str
     job_cd:int
     experience:str

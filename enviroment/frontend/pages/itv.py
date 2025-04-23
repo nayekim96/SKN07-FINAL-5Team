@@ -117,8 +117,7 @@ def page1():
                      "company_cd": str(st.session_state['company_cd']),
                      "job_cd" : st.session_state['job_cd'],
                      "experience" : st.session_state['experience'] }
-                
-
+                 
         headers = {'accept': 'application/json',
                    'Content-Type':'application/json; charset=utf-8'}
 
@@ -414,10 +413,8 @@ def page3():
                 timer_thread.start()
 
             if st.session_state.recording == False:
-                st.error('녹음 쓰레드 시작')
                 audio_thread.start()
                 st.session_state.recording = True
-                # audio_record_start()
 
             if st.session_state.streaming_running == False:
                 st.session_state.streaming_running = True

@@ -58,7 +58,6 @@ def interview_start(data: ItvProcessSchema):
     connect.db.commit()
     connect.close()
 
-    convert_question = get_question_text_convert(question_list)
     
     parent_path = os.path.dirname(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
     now_time = datetime.now()
@@ -70,10 +69,10 @@ def interview_start(data: ItvProcessSchema):
 
     root_path = os.path.join(parent_path, join_path)
     create_folder(root_path)
-    create_question_tts(convert_question['q_split_list'], root_path, process_id)
+    create_question_tts(question_list, root_path, process_id)
 
     res_data = {'process_id':process_id,
-                'q_list' : convert_question['q_list'],
+                'q_list' : question_list,
                 'audio_path' : join_path}
 
     return res_data
@@ -142,31 +141,24 @@ def interview_result_process(data: ItvResultProcessSchema):
         eval_insert_list = []
         report_data = []
         
-        eval_input_data = [{'ques_text' : question, 'answer_user_text' : answer_list[idx], 'answer_end_time': 90} for idx, question enumerate(question_list)]
+        eval_input_data = [{'ques_text' : question, 'answer_user_text' : answer_list[idx], 'answer_end_time': 90} for idx, question in enumerate(question_list)]
 
 
         eval_list = evaluate_answers(eval_input_data ,mats, user_query)
         
 
-
-
-        for idx, question in enumerate(question_list):
-            answer = answer_list[idx]
-            interview_data = { "ques_text" : question,
-                               "answer_user_text" : answer,
-                               "answer_end_time" : 90 
-                             }
-            
-            eval_result = evaluate_answers(interview_data, mats, user_query) 
-            feedback = eval_result['피드백']
-            answer_logic = null_and_exist_check(feedback, '논리성')
-            q_comp = null_and_exist_check(feedback, '질문 이해도')
-            job_exp = null_and_exist_check(feedback, '직무 전문성')
-            hab_chk = null_and_exist_check(feedback, '표현 습관')
-            time_mgmt = null_and_exist_check(feedback, '시간 활용력')
-            answer_all_review = eval_result['총평']    
+        for eval_num in eval_list.keys():
+            idx = (int(eval_num) - 1)
+            eval_result = eval_list[eval_num]
+            feedback = eval_result['feedback']
+            answer_logic = null_and_exist_check(feedback, 'answer_logic')
+            q_comp = null_and_exist_check(feedback, 'q_comp')
+            job_exp = null_and_exist_check(feedback, 'job_exp')
+            hab_chk = null_and_exist_check(feedback, 'hab_chk')
+            time_mgmt = null_and_exist_check(feedback, 'time_mgmt')
+            answer_all_review = eval_result['answer_all_review']    
         
-            eval_data = tuple([data.interview_id, (idx+1), question, answer, eval_result['권장답변'], 90, answer_all_review, answer_logic, q_comp, job_exp, hab_chk, time_mgmt])
+            eval_data = tuple([data.interview_id, eval_num, question_list[idx], answer_list[idx], eval_result['answer_example_text'], 90, answer_all_review, answer_logic, q_comp, job_exp, hab_chk, time_mgmt])
             
             eval_insert_list.append(eval_data)
             
@@ -183,19 +175,35 @@ def interview_result_process(data: ItvResultProcessSchema):
         for result_data in eval_insert_list:
             connect.cursor.execute(result_insert_query, result_data)
        
-         
+
+        connect.db.commit()
+
+        total_report_data = total_report(report_data)
         
+        report_insert_query = f""" INSERT INTO  INTERVIEW_REPORT
+                                   VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                               """
+        
+        report_insert_data = tuple([data.interview_id, total_report_data['answer_all_review'], \
+                                   total_report_data['score']['qs_relevance'], total_report_data['score']['clarity'], \
+                                   total_report_data['score']['job_relevance'], total_report_data['answer_logic'], \
+                                   total_report_data['q_comp'], total_report_data['hab_chk'], total_report_data['job_exp'], \
+                                   total_report_data['time_mgmt'], ''])
+
+        connect.cursor.execute(report_insert_query, report_insert_data)
+
+        connect.db.commit()
 
     except Exception as e:
         print(e)
         status = "error"
     finally:
-        connect.db.commit()
         connect.close()
         status = "ok"
 
     res_data = {"status" : status}
     return res_data
+
 
 
 def common_select_process(select_list:dict, key:str, value: str, list_nm: str):
