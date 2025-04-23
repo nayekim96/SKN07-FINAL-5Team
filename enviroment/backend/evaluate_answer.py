@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from prompt.prompts import ev_hum_prompt, ev_eng_prompt, ev_arts_prompt, ev_list
-from generate_question import GenerateQuestion
+from .prompt.prompts import ev_hum_prompt, ev_eng_prompt, ev_arts_prompt, ev_list
+from .generate_question import GenerateQuestion
 
 
 load_dotenv()
@@ -54,7 +54,7 @@ def get_interview_data(user_id):
     """
 
     latest_itv = pdb.select_one(select_latest_query)
-    # interview_id = latest_itv['interview_id']
+    interview_id = latest_itv['interview_id']
 
     # interview_id 로 면접 데이터 가져오기
     select_answer_query = """
@@ -63,7 +63,7 @@ def get_interview_data(user_id):
     WHERE interview_id = %s and answer_user_text is not null;
     """
 
-    answer = pdb.select_all_vars(select_answer_query, 99)
+    answer = pdb.select_all_vars(select_answer_query, interview_id)
 
     return answer
 
@@ -159,7 +159,9 @@ def evaluate_answers(interview_data, application_mats, user_query):
         1. <지원정보>에서 면접자의 희망 기업, 직무, 경력을 파악해 권장답변 생성에 참고하세요.
         2. 질문에서 의도를 파악해 의도에 부합하는 답변을 생성하세요.
         3. 답변은 <지원정보>와 관련이 있어야 하고, 문장이 논리적이어야 합니다.
-        4. 직업명은 보편적으로 사용하는 명칭을 사용하세요.
+        4.(상황 → 행동 → 결과)로 답변 흐름이 자연스럽게 작성하세요.
+        5. 직업명은 보편적으로 사용하는 명칭을 사용하세요.
+
         ---
         [평가 항목]
         {ev_list}
@@ -167,33 +169,43 @@ def evaluate_answers(interview_data, application_mats, user_query):
         [평가 방식]  
         - 각 답변에 대한 평가 진행
         - 각 항목에 대해 200자 이하의 간결한 문장으로 피드백 작성
+        - 면접자의 성향, 강약점을 판단해 면접자가 인식할 수 있도록 작성
         ---
 
         [출력 형식 예시]
         다음 형식의 JSON으로 응답해주세요:
+        용어의 의미를 참고해서 알맞게 출력해주세요.
+        - answer_example_text: 권장답변
+        - feedback: 피드백
+        - answer_logic : 논리성
+        - q_comp : 질문 이해도
+        - job_exp : 직무 전문성
+        - hab_chk : 표현 습관
+        - time_mgmt : 시간 활용력
+        - answer_all_review : 총평
 
         {{
-        "질문1": {{
-            "권장답변": "...",
-            "피드백": {{
-                "논리성": "...",
-                "질문 이해도": "...",
-                "직무 전문성": "...",
-                "표현 습관": "...",
-                "시간 활용력": "..."
+        "1": {{
+            "answer_example_text": "...",
+            "feedback": {{
+                "answer_logic": "...",
+                "q_comp": "...",
+                "job_exp": "...",
+                "hab_chk": "...",
+                "time_mgmt": "..."
             }},
-            "총평": "..."
+            "answer_all_review": "..."
             }},
-        "질문2:" {{
-            "권장답변": "...",
-            "피드백": {{
-                "논리성": "...",
-                "질문 이해도": "...",
-                "직무 전문성": "...",
-                "표현 습관": "...",
-                "시간 활용력": "..."
+        "2:" {{
+            "answer_example_text": "...",
+            "feedback": {{
+                "answer_logic": "...",
+                "q_comp": "...",
+                "job_exp": "...",
+                "hab_chk": "...",
+                "time_mgmt": "..."
             }},
-            "총평": "..."
+            "answer_all_review": "..."
             }},
         ...
         }}

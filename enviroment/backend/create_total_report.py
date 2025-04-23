@@ -107,7 +107,7 @@ def total_report(reviews):
         - 각 평가 기준별 **점수화**와 **요약 피드백**을 제공합니다.
 
         ## 평가 방식:
-        - [평가 총평]을 기반으로 [평가 항목 및 기준]에 따라 점수화 하세요.
+        - [평가 총평]을 기반으로 [평가 항목 및 기준]에 따라 점수화하고, 종합적으로 평가하여 총평을 간단한 문장으로 작성 하세요.
         - [평가 기준별 피드백]을 항목별로 요약해 요약 피드백을 간결하게 작성하세요. 
         - 요약 피드백 작성 시, 면접자가 자신의 약점을 파악할 수 있도록 작성하세요.
         - 이해하기 쉬운 문장으로 작성하고, 친절하고 부드러운 말투로 작성하세요.
@@ -138,19 +138,30 @@ def total_report(reviews):
 
         [출력 형식 예시]
         다음 형식의 JSON으로 응답해주세요:
+        용어의 의미를 참고해서 알맞게 출력해주세요.
+        - answer_all_review: 총평
+        - score: 점수
+        - qs_relevance: 질문 적합성
+        - clarity: 논리성과 구체성
+        - job_relevance: 직무 연관성
+        - answer_logic : 논리성
+        - q_comp : 질문 이해도
+        - job_exp : 직무 전문성
+        - hab_chk : 표현 습관
+        - time_mgmt : 시간 활용력
 
         {{
-            "총평": "면접자는 전반적으로 명확하고 논리적인 답변을 전달하려 노력했으며, 일부 질문에서 직무 연관성이 부족한 점이 보였지만, 팀워크와 학습 태도는 긍정적으로 드러났습니다. 특정 질문에서 반복적으로 질문 요지를 벗어난 부분은 개선이 필요합니다.",
-            "점수": {{
-                "질문 적합성": 83,
-                "논리성과 구체성": 78,
-                "직무 연관성": 70
+            "answer_all_review": "면접자는 전반적으로 명확하고 논리적인 답변을 전달하려 노력했으며, 일부 질문에서 직무 연관성이 부족한 점이 보였지만, 팀워크와 학습 태도는 긍정적으로 드러났습니다. 특정 질문에서 반복적으로 질문 요지를 벗어난 부분은 개선이 필요합니다.",
+            "score": {{
+                "qs_relevance": 83,
+                "clarity": 78,
+                "job_relevance": 70
             }},
-            "논리성": "...",
-            "질문 이해도": "...",
-            "직무 전문성": "...",
-            "표현 습관": "...",
-            "시간 활용력": "..."
+            "answer_logic": "...",
+            "q_comp": "...",
+            "job_exp": "...",
+            "hab_chk": "...",
+            "time_mgmt": "..."
         }}
         """
     )
@@ -172,10 +183,10 @@ def total_report(reviews):
     return response
 
 
-if __name__ == '__main__':
-    reviews = get_all_reviews('interview')
-    feedbacks = total_report(reviews)
+# if __name__ == '__main__':
+#     reviews = get_all_reviews('interview')
+#     feedbacks = total_report(reviews)
 
-    print(feedbacks)
+#     print(feedbacks)
 
     
