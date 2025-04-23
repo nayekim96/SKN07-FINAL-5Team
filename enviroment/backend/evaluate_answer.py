@@ -96,9 +96,8 @@ def evaluate_answers(interview_data, application_mats, user_query):
         formatted_data = []
         for idx, entry in enumerate(interview_data):
             formatted_data.append(f"질문 {idx+1}: {entry['ques_text']}\n사용자 답변: {entry['answer_user_text']}\n답변 시간: {entry['answer_end_time']}")
-        
-        dataset = '\n\n'.join(formatted_data)
 
+        dataset = '\n\n'.join(formatted_data)
     else:
         return "면접 데이터가 존재하지 않습니다."
 
@@ -257,4 +256,4 @@ def save_generated_evals(response):
 
 #     results = evaluate_answers(interview_data, appli_mats, user_queries)
 
-#     print(results)
+#     print(interview_data)

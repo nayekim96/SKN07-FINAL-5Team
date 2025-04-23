@@ -1,8 +1,8 @@
 from typing import Union
 from fastapi import APIRouter, FastAPI, status
 from pydantic import BaseModel
-from db_util.db_utils import post_db_connect
-from routers.main_routers import api_router
+from .db_util.db_utils import post_db_connect
+from .routers.main_routers import api_router
 
 app = FastAPI(
     title="SKAI Networks7 mock interview",
