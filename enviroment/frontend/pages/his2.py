@@ -130,7 +130,7 @@ with tab1:
             "질문 적합성": report_data['area_score_one'],
             "논리성과 구체성": report_data['area_score_two'],
             "직무 연관성": report_data['area_score_three']}
-    
+
     answer_all_review = "..."
 
     with col1:
@@ -144,7 +144,7 @@ with tab1:
     with col2:
         st.write("<p class='section-title'>총평</p>", unsafe_allow_html=True)
         st.write(f"<div class='review-container col'>{overall_review}</div>", unsafe_allow_html=True)
-    
+
     # ----------- 구분선
     st.divider()
 
@@ -161,11 +161,11 @@ with tab1:
     for criteria, review in reviews.items():
         with col1:
                 st.write(f"<div class='criteria col-medium'>{criteria}</div>", unsafe_allow_html=True)
-        
+
         with col2:
                 st.write(f"<div class='review col-medium'>{review}</div>", unsafe_allow_html=True)
-        
-        
+
+
 
     st.markdown("---")
 

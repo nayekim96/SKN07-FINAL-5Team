@@ -74,7 +74,7 @@ for interview in interviews:
         # 페이지 이동을 위한 버튼
         btn_key = f"btn_{interview['interview_id']}"
         if st.button("📊 면접 결과 분석", key=btn_key):
-            st.session_state['selected_interview'] = interview    
+            st.session_state['selected_interview'] = interview
             st.session_state['history_interview_id'] = interview['interview_id']
 
             st.switch_page("pages/his2.py")   # 페이지 이동
@@ -92,23 +92,21 @@ with center:
     #        page_num = idx + 1
     #        btn_type = 'secondary'
     #        if page_num == st.session_state['page_num']:
-    #            btn_type = 'primary'                
+    #            btn_type = 'primary'
 #
  #           if st.button(str(page_num), type=btn_type):
   #              st.session_state['page_num'] = page_num
    #             st.switch_page("pages/his1.py")
 
-    with st.container(key="board_container"):    
+    with st.container(key="board_container"):
         for idx in range(history_info['total_page']):
             page_num = idx + 1
             btn_type = 'secondary'
             if page_num == st.session_state['page_num']:
-                btn_type = 'primary'                
+                btn_type = 'primary'
 
             if st.button(str(page_num), type=btn_type, key=str(page_num)):
                 st.session_state['page_num'] = page_num
                 st.switch_page("pages/his1.py")
 with empty2:
     pass
-
-

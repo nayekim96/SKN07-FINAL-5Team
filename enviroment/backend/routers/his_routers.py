@@ -12,7 +12,7 @@ if main_dir not in sys.path:
     sys.path.append(main_dir)
 
 from schemas.history_schemas import HisBoardSchema, HisReportSchema, HisMemoSchema
-from db_util.db_utils import post_db_connect 
+from db_util.db_utils import post_db_connect
 import math
 
 
@@ -31,13 +31,13 @@ def get_history(data:HisBoardSchema):
                            WHERE user_id = '{data.user_id}'
                        """
         total = connect.select_one(count_query)['cnt']
-        
+
         total_page = math.trunc(total / PAGE_SIZE)
 
         if (total / PAGE_SIZE) > 0:
             total_page += 1
 
-        
+
         page_where_query = ""
 
         if data.page_num == 1:
@@ -57,7 +57,7 @@ def get_history(data:HisBoardSchema):
                                               ip.kewdcdno,
                                               ip.insert_date,
                                               ip.person_exp
-                                       from interview_process ip 
+                                       from interview_process ip
                                        where user_id = '{data.user_id}' ) as a
                                 {page_where_query}
                             ), select_company as (
@@ -67,7 +67,7 @@ def get_history(data:HisBoardSchema):
                                        bd.person_exp,
                                        bd.interview_id
                                 from base_data  as bd
-                                join  company_code_master_tbl ccmt  
+                                join  company_code_master_tbl ccmt
                                 on cast(bd.company_nm as integer) = ccmt.common_id
                             ), select_job as (
                                 select sc.interview_id ,
@@ -76,9 +76,9 @@ def get_history(data:HisBoardSchema):
                                        sc.person_exp,
                                        sc.insert_date
                                 from select_company as sc
-                                join job_code_master_tbl jcmt 
+                                join job_code_master_tbl jcmt
                                 on sc.kewdcdno = jcmt.common_id
-                            ) 
+                            )
                             select interview_id ,
                                    company_name,
                                    job_name,
@@ -93,17 +93,17 @@ def get_history(data:HisBoardSchema):
         print(e)
     finally:
         connect.close()
-   
+
 
 @router.post("/get_report")
 def get_report(data: HisReportSchema ):
     res_data = {}
     try:
         result_query = f"""select ir.ques_text as question,
-	                              ir.answer_user_text as user_answer,
-                            	  ir.answer_example_text as recommended_answer,
-                            	  ir.answer_all_review as feedback 
-                           from interview_result ir 
+                                  ir.answer_user_text as user_answer,
+                                  ir.answer_example_text as recommended_answer,
+                                  ir.answer_all_review as feedback
+                           from interview_result ir
                            where ir.interview_id  = {data.interview_id}
                            order by ir.ques_step;
                         """
@@ -125,7 +125,7 @@ def get_report(data: HisReportSchema ):
         connect = post_db_connect()
 
         report_data = connect.select_one(report_query)
-        
+
         result_data = connect.select_all(result_query)
 
 
