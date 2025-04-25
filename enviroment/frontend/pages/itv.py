@@ -24,6 +24,8 @@ from pydub import AudioSegment
 import openai
 from pathlib import Path
 import shutil
+from moviepy import VideoFileClip, AudioFileClip
+import traceback
 
 
 interview = Mock_interview()
@@ -195,8 +197,8 @@ def page3():
     process_id = st.session_state['process_id']
     
     AUDIO_FORMAT = pyaudio.paInt16
-    AUDIO_CHANNELS = 0
-    AUDIO_RATE = 16000
+    AUDIO_CHANNELS = 1
+    AUDIO_RATE = 44100
     AUDIO_CHUNK = 1024
 
     audio_frames = []
@@ -297,7 +299,16 @@ def page3():
             st.session_state.timer_running = False  # 타이머 종료
             st.session_state.streaming_running = False # 웹캠 종료
 
-    
+    def video_merge(video_output_path:str, audio_output_path:str, merge_output_path:str):
+        try:
+            video_file = VideoFileClip(video_output_path)
+            audio_file = AudioFileClip(audio_output_path)
+
+            video = video_file.with_audio(audio_file)
+
+            video.write_videofile(merge_output_path,codec="libx264", audio_codec="aac")
+        except Exception as e:
+            print(f'[merge file] {e}')
 
     def audio_record_process():
         def audio_callback(in_data, frame_count, time_info, status):
@@ -341,8 +352,16 @@ def page3():
         wf.setframerate(AUDIO_RATE)
         wf.writeframes(b''.join(audio_frames))
         wf.close()
-        shutil.copyfile(file_path, f"{write_path}{process_id}_audio_original.wav")
-    
+        original_audio_path = f"{write_path}{process_id}_audio_original.wav"
+        shutil.copyfile(file_path, original_audio_path)
+        audio_file_list = audio_split()
+        result = question_result_process(audio_file_list)
+        video_merge(f"{write_path}{process_id}_video.mp4", original_audio_path, f"{write_path}{process_id}_merge_viedo.mp4")
+        if result['status'] == 'ok':
+            def itv_done():
+                st.switch_page('pages/main_page.py')
+            itv_done_btn_placeholder.button('면접 종료', on_click=itv_done) 
+            
     # 타이머, 오디오 쓰레드 생성
     timer_thread = threading.Thread(target=countdown_timer, daemon=True)
     audio_thread = threading.Thread(target=audio_record_process, daemon=True)
@@ -487,8 +506,6 @@ def page3():
                 video_writer.release()
                 cap.release()
                 cv2.destroyAllWindows()
-                audio_file_list = audio_split() 
-                result = question_result_process(audio_file_list)
                 
     async def main_loop(frame_placeholder):
         await asyncio.gather(webcam_start(frame_placeholder))
@@ -549,6 +566,7 @@ def page3():
     frame_placeholder = None 
     audio_placeholder = None
     qa_placeholder = None
+    itv_done_btn_placeholder = None
     with empty1:
         pass
 
@@ -569,8 +587,9 @@ def page3():
         frame_placeholder = st.empty()
 
     with con4_1:
-        if st.button('면접종료', disabled=(st.session_state['streaming_running'] == False)):
-            st.switch_page('pages/main_page.py') 
+        itv_done_btn_placeholder = st.empty()
+        #if st.button('면접종료'):
+        #    st.switch_page('pages/main_page.py') 
 
     with empty2:
         pass
