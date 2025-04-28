@@ -35,7 +35,7 @@ def get_application_mats(user_id):
 
     return appli_mats    
 
-# ------- 면접 데이터 로드 (질문, 답변, 권장답변, 답변시간) -------
+# ------- 면접 데이터 로드 (질문, 답변, 답변시간) -------
 def get_interview_data(user_id):
     """
     면접 데이터 로드
