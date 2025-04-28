@@ -35,7 +35,6 @@ chroma_db = Chroma(
     embedding_function=embeddings,
     client=chroma_client
 )
-
 es_client = Elasticsearch("http://43.202.186.183:9200", basic_auth=('elastic', 'ElastiC7276'))
 es_store = ElasticSearchBM25Retriever(client=es_client, index_name="job_position", k=30)
 
@@ -93,3 +92,4 @@ hybrid_chain = (
 
 def recommend_jobs(text: str) -> str:
     return hybrid_chain.invoke(text)
+

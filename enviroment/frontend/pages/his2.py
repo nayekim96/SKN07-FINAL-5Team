@@ -109,7 +109,58 @@ st.title("히스토리 - 종합 레포트")
 if st.button("⬅ 면접 히스토리로 돌아가기"):
     st.switch_page("pages/his1.py")
 
-interview = st.session_state['selected_interview']
+history_info = get_history_list()
+
+interviews = history_info['history_data']
+
+print(interviews)
+
+# interview_id = st.session_state["history_interview_id"]
+
+interview = next(item for item in interviews)
+
+print(interview)
+
+# 데이터 불러오기
+# if "selected_interview" not in st.session_state:
+#     st.session_state["selected_interview"] = {
+#         "title": "데이터 없음", "date": "N/A", "company": "N/A", "role": "N/A", "level": "N/A"
+#     }
+
+# interview = st.session_state["selected_interview"]
+
+# if "interview_data" not in st.session_state:
+#     st.session_state["interview_data"] = {
+#         "question_text": "데이터가 존재하지 않습니다.",
+#         "answer_all_review": "데이터가 존재하지 않습니다."
+#     }
+
+# evaluations = st.session_state["evaluations"]
+
+# if "evaluations" not in st.session_state:
+#     st.session_state["evaluations"] = {
+#         "answer_example_text": "데이터가 존재하지 않습니다.",
+#         "answer_all_review": "데이터가 존재하지 않습니다."
+#     }
+
+# evaluations = st.session_state["evaluations"]
+
+# if "total_evaluations" not in st.session_state:
+#     st.session_state["total_evaluations"] = {
+#         "answer_all_review": "데이터가 존재하지 않습니다.",
+#         "score": {
+#             "qs_relevance": "N/A",
+#             "clarity": "N/A",
+#             "job_relevance": "N/A"
+#         },
+#         "answer_logic": "...",
+#         "q_comp": "...",
+#         "job_exp": "...",
+#         "hab_chk": "...",
+#         "time_mgmt": "..."
+#     }
+
+# total_evaluations = st.session_state["total_evaluations"]
 
 st.write(f"### {interview['company_name']} - {interview['job_name']} ({interview['person_exp']})")
 st.write(f"면접 날짜: {interview['insert_date']}")

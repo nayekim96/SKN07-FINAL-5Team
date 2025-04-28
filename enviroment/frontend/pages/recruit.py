@@ -4,6 +4,7 @@ import requests
 import random
 from sidebar import show_sidebar
 
+
 st.set_page_config(layout="wide")
 show_sidebar()
 
@@ -25,48 +26,43 @@ st.markdown(
                     padding-right: 5rem;
                 }
                 [data-testid="stSidebarNav"] {display: none;}
-        </style>
-        
-        """,
-    unsafe_allow_html=True,
-)
+             .card {
+            background-color: #f9f9f9;
+            padding: 1.2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        .card-meta {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .card-badge {
+            display: inline-block;
+            background-color: #007acc;
+            color: white;
+            padding: 0.3em 0.8em;
+            margin: 0.2em 0.2em 0 0;
+            border-radius: 0.6em;
+            font-size: 0.85em;
+        }
+        .card-reason {
+            font-style: italic;
+            color: #0066cc;
+            border-top: 1px solid #eee;
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+        }
+                </style>
 
-st.markdown("""
-<style>
-.card {
-    background-color: #f9f9f9;
-    padding: 1.2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    margin-bottom: 1rem;
-}
-.card-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-}
-.card-meta {
-    font-size: 0.9rem;
-    color: #555;
-}
-.card-badge {
-    display: inline-block;
-    background-color: #007acc;
-    color: white;
-    padding: 0.3em 0.8em;
-    margin: 0.2em 0.2em 0 0;
-    border-radius: 0.6em;
-    font-size: 0.85em;
-}
-.card-reason {
-    font-style: italic;
-    color: #0066cc;
-    border-top: 1px solid #eee;
-    margin-top: 1rem;
-    padding-top: 0.5rem;
-}
-</style>
-""", unsafe_allow_html=True)
+                """,
+            unsafe_allow_html=True
+        )
 
 st.title("📄 채용 공고")
 
