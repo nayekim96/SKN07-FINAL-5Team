@@ -12,6 +12,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID'),
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY'),
 BUCKET_NAME = os.getenv('BUCKET_NAME')
@@ -29,87 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# s3 object storage
-s3 = boto3.client(
-    "s3",
-    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY'),
-    )
-bucket_name = os.getenv('BUCKET_NAME')
-
-recommendation_results = {} # 추천된 공고
-
-@app.post("/process_user_files")
-async def process_user_files(
-    session_id: str = Form(...),
-    resume: Optional[UploadFile] = File(None),
-    coverletter: Optional[UploadFile] = File(None),
-    portfolio: Optional[UploadFile] = File(None),
-):
-    uploaded_files_content = {}
-    has_uploaded = False
-    try:
-        if resume:
-            has_uploaded = True
-            resume_content = await resume.read()
-            uploaded_files_content["resume"] = resume_content
-            filename = resume.filename
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            s3_key = f"user_files/{session_id}/{timestamp}_resume_{filename}"
-            try:
-                s3.upload_fileobj(resume.file, BUCKET_NAME, s3_key,
-                                  ExtraArgs={"Metadata": {"session_id": session_id, "original_filename": filename, "file_type": "resume", "upload_timestamp": datetime.now().isoformat()}})
-                print(f"'resume_{filename}'이(가) S3에 업로드되었습니다 (Key: {s3_key})")
-            except Exception as e_s3:
-                print(f"S3 업로드 오류 (resume): {e_s3}")
-
-        if coverletter:
-            has_uploaded = True
-            coverletter_content = await coverletter.read()
-            uploaded_files_content["coverletter"] = coverletter_content
-            filename = coverletter.filename
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            s3_key = f"user_files/{session_id}/{timestamp}_coverletter_{filename}"
-            try:
-                s3.upload_fileobj(coverletter.file, BUCKET_NAME, s3_key,
-                                  ExtraArgs={"Metadata": {"session_id": session_id, "original_filename": filename, "file_type": "coverletter", "upload_timestamp": datetime.now().isoformat()}})
-                print(f"'coverletter_{filename}'이(가) S3에 업로드되었습니다 (Key: {s3_key})")
-            except Exception as e_s3:
-                print(f"S3 업로드 오류 (coverletter): {e_s3}")
-
-        if portfolio:
-            has_uploaded = True
-            portfolio_content = await portfolio.read()
-            uploaded_files_content["portfolio"] = portfolio_content
-            filename = portfolio.filename
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            s3_key = f"user_files/{session_id}/{timestamp}_portfolio_{filename}"
-            try:
-                s3.upload_fileobj(portfolio.file, BUCKET_NAME, s3_key,
-                                  ExtraArgs={"Metadata": {"session_id": session_id, "original_filename": filename, "file_type": "portfolio", "upload_timestamp": datetime.now().isoformat()}})
-                print(f"'portfolio_{filename}'이(가) S3에 업로드되었습니다 (Key: {s3_key})")
-            except Exception as e_s3:
-                print(f"S3 업로드 오류 (portfolio): {e_s3}")
-
-        if has_uploaded:
-            # PDF 내용들을 RAG 모듈로 처리하고 추천 결과 얻기
-            recommendations = read_pdf_recommend_recruit(uploaded_files_content)
-            recommendation_results[session_id] = recommendations
-            return {"success": True, "message": "파일 처리 및 추천 준비 완료"}
-        else:
-            return {"success": False, "error": "업로드된 파일이 없습니다."}
-
-    except Exception as e:
-        return {"success": False, "error": str(e)}
-
-@app.get("/recommendations/{session_id}")
-async def get_recommendations(session_id: str):
-    results = recommendation_results.get(session_id)
-    if results:
-        return {"recommendations": results}
-    else:
-        return {"recommendations": []}
+app.include_router(pdf_upload_routers.router)
+app.include_router(rec_routers.router, prefix="/api")
+app.include_router(job_routers.router, prefix="/api")
 
 #app.include_router(api_router)
 class HealthCheck(BaseModel):
