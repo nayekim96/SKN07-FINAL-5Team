@@ -1,17 +1,30 @@
 import streamlit as st
 from sidebar import show_sidebar
 import time
-import cv2
-import tempfile
-import openai
-import os
-from dotenv import load_dotenv
+st.set_page_config(layout="wide")
+show_sidebar()
+# 페이지 상단 공백 제거 markdown
+st.markdown(
+    """
+        <style>
+                .stAppHeader {
+                    background-color: rgba(255, 255, 255, 0.0);  /* Transparent background */
+                    visibility: visible;  /* Ensure the header is visible */
+                }
 
+            .block-container {
+                    padding-top: 1rem;
+                    padding-bottom: 0rem;
+                    padding-left: 5rem;
+                    padding-right: 5rem;
+                }
+                [data-testid="stSidebarNav"] {display: none;}
+        </style>
+        """,
+    unsafe_allow_html=True,
+)
 
-load_dotenv()
-# OpenAI API 키 설정
-openai.api_key = os.environ.get('OPENAI_API_KEY')
-client = openai.OpenAI()
+st.title("장비 테스트")
 
 # 세션 상태 초기화
 for key in ["webcam_bool", "audio_bool", "speaker_bool", "test_count", "ready_for_next"]:
@@ -159,3 +172,4 @@ def main():
 # 스크립트 실행
 if __name__ == "__main__":
     main()
+

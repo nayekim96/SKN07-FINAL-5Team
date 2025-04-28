@@ -1,33 +1,11 @@
 import streamlit as st
-import os
-import sys
 from sidebar import show_sidebar
 
-# --------- IMPORT CLASS FROM OTHER DIRS ----------
-# 현재 파일의 디렉토리 경로
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# 상위 디렉토리 (/enviroment/frontend)
-main_dir = os.path.abspath(os.path.join(current_dir, ".."))
-if main_dir not in sys.path:
-    sys.path.append(main_dir)
-
-# 모의 면접 URL class import
-from utils.mock_interview import Mock_interview
-interview = Mock_interview()
-
-# 최상위 디렉토리 (/enviroment)
-top_dir = os.path.abspath(os.path.join(main_dir, ".."))
-if top_dir not in sys.path:
-    sys.path.append(top_dir)
-
-# --------- sidebar 호출 ---------
 st.set_page_config(layout="wide")
 show_sidebar()
-
-# --------- CSS (상단 여백 제거) ---------
+# 페이지 상단 공백 제거 markdown
 st.markdown(
-        """
+    """
         <style>
                 .stAppHeader {
                     background-color: rgba(255, 255, 255, 0.0);  /* Transparent background */
@@ -93,32 +71,5 @@ def set_company_job_info():
 
 with col2:
     if st.button("입력 완료"):
-
-        # 기업 확인
-        if company_name == common_select_text:
-            company_placeholder.warning('기업을 선택해주세요!' , icon="⚠️")
-        # 직무 확인
-        if job_title == common_select_text:
-            job_placeholder.warning('직무를 선택해주세요!' , icon="⚠️")
-        # 기업, 직무 골랐을 시 면접 질문 생성 및 장비테스트 페이지 이동
-        if company_name != common_select_text and \
-           job_title != common_select_text:
-            set_company_job_info()
-
-            # -------- 면접 질문 생성 --------
-            # session내 기업/직무/경력 정보 변수 선언
-
-            company_nm = st.session_state['company_name']
-            job_nm = st.session_state['job_name']
-            experience = st.session_state['experience']
-
-            post_data = { "company_nm" : str(company_nm),
-                          "job_nm" : str(job_nm),
-                          "experience": str(experience)
-                        }
-
-            headers = {'accept': 'application/json',
-                       'Content-Type':'application/json; charset=utf-8'}
-            st.session_state['new_questions'] = interview.get_question_list(post_data, headers) 
-            #장비테스트 페이지 이동
-            st.switch_page("pages/equipment_test.py")
+        st.session_state["page"] = "rec_1"  # 추천 공고 페이지 이동
+        st.rerun()

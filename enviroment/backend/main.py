@@ -1,16 +1,40 @@
-from typing import Union
-from fastapi import APIRouter, FastAPI, status
+from typing import Union, Optional
+from fastapi import APIRouter, FastAPI, status, File, Form, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from .db_util.db_utils import post_db_connect
-from .routers.main_routers import api_router
+from backend.RAG import read_pdf_recommend_recruit
+import fitz
+import boto3
+import os
+from pathlib import Path
+import uuid
+from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID'),
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY'),
+BUCKET_NAME = os.getenv('BUCKET_NAME')
 
 app = FastAPI(
     title="SKAI Networks7 mock interview",
     version="0.1"
 )
 
-app.include_router(api_router)
+# 미들웨어 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(pdf_upload_routers.router)
+app.include_router(rec_routers.router, prefix="/api")
+app.include_router(job_routers.router, prefix="/api")
 
+#app.include_router(api_router)
 class HealthCheck(BaseModel):
     """Response model to validate and return when performing a health check."""
 
@@ -52,10 +76,3 @@ def get_health() -> HealthCheck:
     """
     return HealthCheck(status="OK")
 
-# @app.post("/query", status_code=200)
-# async def query(data:Model~~~):
-#     retriever = get_retriever(retriever_type)
-#     model = get_models(model_name)
-#     chain = retriever | prompt | model | stroutputparser()
-#     res = chain.invoke()
-#     return 0
