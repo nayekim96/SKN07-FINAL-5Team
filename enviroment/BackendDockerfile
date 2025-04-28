@@ -17,14 +17,11 @@ WORKDIR /home/encore/
 # 파이썬 개발 패키지, c 컴파일러, 오디오 관련 라이브러리 설치
 # PyAudio 빌드를 위해 portaudio19-dev 패키지를 추가했습니다.
 # 각 줄의 끝에 있는 백슬래시(\) 뒤에 공백이 없는지 확인해주세요.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3-dev \
+RUN apt-get update && apt-get install -y \
     gcc \
-    linux-headers-amd64 \
-    libasound2-dev \
-    libpulse-dev \
     portaudio19-dev \
-    pkg-config \
+    libsndfile1 \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # USER : 사용자 및 그룹 ID를 encore로 설정합니다.
